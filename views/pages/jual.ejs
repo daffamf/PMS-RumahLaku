@@ -1,0 +1,376 @@
+<%- include('../partials/header') %>
+    <style>
+        .box-drop {
+            width: 380px;
+            height: 460px;
+            border: 2px solid rgb(161, 156, 156);
+            border-style: dashed;
+            margin: 10px;
+            float: left;
+        }
+
+        .card {
+
+            box-shadow: 0 10px 10px 0 grey;
+        }
+
+        .card-img-top {
+            border: none;
+            cursor: pointer;
+        }
+
+        .card-image :hover {
+            border-radius: 15px;
+            box-shadow: 0 4px 10px 0 grey;
+        }
+
+        .col-for-drop-box {
+            padding: 30px;
+            width: 100%;
+            height: 600px;
+            border: 1px solid rgb(231, 230, 230);
+        }
+
+        .drop-procedure {
+            float: right;
+            margin-top: 10px;
+            width: 240px;
+            height: 170px;
+            border: 1px solid salmon;
+            text-align: center;
+
+        }
+
+        .negotiable {
+            color: grey;
+            font-size: small;
+        }
+
+        .nav-link {
+            font-size: large;
+            padding: 15px;
+        }
+
+        .drag-drop {
+            border: 2px solid rgb(160, 159, 159);
+            border-style: dashed;
+
+        }
+
+        h1 {
+            color: grey;
+            font-family:fantasy ;
+        }
+
+        .navbars {
+            text-decoration: none;
+            color: rgba(0, 0, 0, .8);
+            display: block;
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            -moz-box-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            -moz-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            border-bottom: 4px solid #fff;
+            font-size: .9375rem;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        .navbars:hover {
+            color: rgb(0, 0, 0);
+        }
+
+        #pagination-butt {
+            border-radius: 100%;
+            box-shadow: 0 3px 3px 0 grey;
+            background-color: rgba(255, 255, 255, 0.03);
+            margin-right: 10px;
+
+        }
+
+        #pagination-butt :hover {
+            border-radius: 100%;
+            background-color: rgb(170, 165, 165);
+        }
+
+        #pagination-butt button {
+            border-radius: 100%;
+            box-shadow: 0 1px 3px 0 grey;
+            background-color: rgba(255, 255, 255, 0.03);
+
+        }
+
+        #pagination-butt button:hover {
+            border-radius: 100%;
+            background-color: rgb(170, 165, 165);
+        }
+    </style>
+
+    <body>
+
+        <script>
+            function allowDrop(ev) {
+                ev.preventDefault();
+            }
+
+            function drag(ev) {
+                ev.dataTransfer.setData("text", ev.target.id);
+            }
+
+            function drop(ev) {
+                ev.preventDefault();
+                var data = ev.dataTransfer.getData("text");
+                ev.target.appendChild(document.getElementById(data));
+            }
+            function initialize() {
+                var options = {
+                    center: new google.maps.LatLng(-6.9147444, 107.6098111), // longitude latitude bandung
+                    zoom: 13,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP // Tipe ROADMAP
+                };
+                // create map object
+                var map = new google.maps.Map(document.getElementById("googleMap"), options);
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(-6.9247657, 107.6859478), // longitude latitude
+                    map: map,
+                    title: 'Bandung'
+                });
+            }
+            // membuat Event Listener untuk memanggil fungsi initialize pada saat halaman selesai di load
+            google.maps.event.addDomListener(window, 'load', initialize);
+
+        </script>
+        <!-- Navigation Bar  -->
+        <nav class="navbar navbar-expand-md navbar-white fixed-top bg-white">
+            <a class="navbar-brand " href="" style="margin-left: 500px;">
+                <img src="/images/danilla.svg" height="35" class="d-inline-block align-top" alt="">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/">Home
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="#">
+                            <%= isLogin ? `Selamat Datang , ${user.username} ` : "Selamat Datang" %>
+                        </a>
+                    </li>
+            </div>
+            <% if(isLogin){%>
+                <li>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown" id="drp">
+                        <a class="dropdown-item" href="#">Pasang Iklan</a>
+                        <a class="dropdown-item" href="#">Daftar Iklan</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/logout"><img src="/images/power_settings_new-24px.svg" alt="">
+                            Log
+                            Out</a>
+                    </div>
+                    <a href="" class="dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown-menu"
+                        aria-haspopup="true" aria-expanded="true">
+                        <img src="/images/danilla.svg" alt="" class="img-thumbnail"
+                            style="width: 50px;height: 50px; border-radius: 50px;margin-right: 100px;">
+                    </a>
+                </li>
+                <% }else{ %>
+                    <a class="nav-link" href="/signup"> Daftar</a>
+                    <div class="navbar__link-separator"
+                        style="border-right: 1px solid #777;height: .8125rem;margin-right: 5px;padding-right: 5px;">
+                    </div>
+                    <a class="nav-link" href="/signin"> Masuk</a>
+                    <% }; %>
+        </nav><br><br><br>
+        <!-- Navigation Bar  -->
+
+        <!-- MAP -->
+        <div id="googleMap" style="width:100%;height:380px;box-shadow: 0 12px 10px 0 rgba(0,0,0,.2);"></div>
+        <!-- MAP -->
+
+        <ul class="container" style="margin-top: 30px;" id="container">
+
+            <div class="navbars" style="border-bottom:2px solid  rgb(216, 213, 213);height: 90px;margin-bottom:20px ;">
+                <a class="navbars" href="/" style="height:100%;" disabled><span>All</span></a>
+                <a class="navbars" href="/kategori=sewa" style="height:100%;" name="sewa"
+                    aria-disabled="true"><span>Sewa</span></a>
+                <a class="navbars" style="height:100%; color: grey;border-bottom: 3px solid grey;cursor: pointer;"><span>Jual</span></a>
+                <a class=" navbars" href="/murah" style="height:100%;"><span>Urutan Harga Termurah</span></a>
+                <a class="navbars" href="/mahal" style="height:100%;"><span>Urutan Harga Termahal</span></a>
+            </div>
+
+            <!-- Iklan -->
+            <div id="filter"></div>
+            <div class="row row-cols-1 row-cols-md-3 g-4" id="daftar-iklan-list">
+
+
+            </div><br><br>
+            <!-- Iklan -->
+
+            <!-- pagination -->
+            <nav aria-label="Page navigation example pagination">
+                <ul class="pagination justify-content-center">
+
+                </ul>
+            </nav><br>
+            <hr>
+            <!-- pagination -->
+
+            <!-- Drag And Drop Comparation -->
+            <div class="col-for-drop-box">
+                <h3>Bandingkan Iklan</h3>
+                <div class="box-drop" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                <div class="box-drop" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+
+                <div class="drop-procedure">
+                    <div class="card-title" style="background-color: rgb(248, 101, 101);color: white;">Contoh</div>
+                    <div class="card-img-top"><img src="/images/sss.png" alt="" width="100%" height="100%"></div>
+
+                </div>
+                <div class="col-compare" style="width: 200px;height: 30px;">
+                    <a href="/" type="button" class="btn btn-warning" style="width:50px;margin-left: 10px;">
+                        <img src="/images/refresh-24px.svg" alt="">
+                    </a>
+                    <a href="/compare" type="button">
+                        <button class="btn btn-dark" style="width:60%;">Bandingkan</button>
+                    </a>
+                </div>
+            </div>
+            <!-- Drag And Drop Comparation -->
+
+        </ul>
+
+        <div class="fixed-bottom" style="margin:0px 0px 100px 1800px; opacity: 50%;">
+            <button id="backtoback" class="btn btn-secondary">TOP</button>
+        </div>
+        <script type="text/javascript">
+
+            const API_URL = "http://localhost:3000/api/index";
+
+            $(document).ready(function () {
+                getData(1)
+
+                $('.fixed-bottom').click(function () {
+                    $('html,body').animate({
+                        scrollTop: 0
+                    })
+                })
+
+                $(".dropdown-toggle").mouseenter(function () {
+                    $('.dropdown-menu').slideDown().mouseenter(function () {
+                        $(this).slideDown().mouseleave(function () {
+                            $(this).slideUp();
+                        })
+                    })
+                })
+
+            })
+            const getData = (page) => {
+                var url_catch = $(location).attr('search')
+                $.ajax({
+                    url: `${API_URL}/${page}/kategori=jual/${url_catch}`,
+                    method: 'GET',
+                    dataType: 'json'
+                }).done(function (data) {
+                    let filter = JSON.stringify(data.filter)
+                    $("#filter").html(`${filter == 'null' ? `<h1>KATEGORI JUAL</h1><hr>` : `<h1>Pencarian Untuk '${filter.slice(9, filter.length - 1)}'</h1><hr>`}`)
+                    let rows = data.data
+                    let html = ``
+                    if (rows.length == 0) {
+                        html += `<h3 class="text-muted col-7 col-md-12"><img src="/images/search_off-24px.svg"> Tidak ditemukan</h3>`
+                    } else {
+                        rows.forEach((item, index) => {
+                            html += `
+                            <div class="col">
+                                <div class="card h-100" draggable="true" ondragstart="drag(event)" id="${item.id}"
+                                    style="float: left;" data-id="${item.id}">
+                                    <div class="card-body">
+                                        <img class="card-img-top" src="${item.foto}">
+                                            <p></p>
+                                        <div>
+                                        <h5 class="card-title" style="color: rgb(0, 140, 255);">${item.harga} IDR
+                                    
+                                        <small class="negotiable">${item.isNego ? "(Nego)" : "(Harga Pas)"}
+                                           
+                                        </small>
+                                </h5>
+                                <p class="card-text">Jumlah Kamar : ${item.jml_kamar}
+                                    
+                                </p>
+                                <p class="card-text"><img src="/images/pin_drop-24px.svg"> ${item.lokasi}</p>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="col-auto">
+                                <a class="details-link" href="/detail" style="color: black;float: right;">
+                                    Details<img class="gi gi-arrow-right" src="/images/arrow.png"
+                                        style="width: 15px;">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    `})
+                    };
+                    $('#container #daftar-iklan-list').html(html)
+
+                    let pagePrevious = ``;
+                    if (rows.length == 0) {
+                        pagePrevious += `<a href="/"><button class="btn btn-secondary">kembali<button></a>`
+                    }
+                    else if (data.current == 1) {
+                        pagePrevious += `
+                        `
+                    } else {
+                        pagePrevious += `
+                            <li id="pagination-butt">
+                                <button data-id = "${data.previous_page}" type="button" id="page-btn"  class="btn btn-secondary">
+                                    <img src="/images/keyboard_arrow_left-black-18dp.svg" alt="">
+                                </button>
+                            </li> `
+                    }
+                    if (data.current == data.pages) {
+                        pagePrevious += `
+                        `
+                    } else {
+                        pagePrevious += `
+                            <li id="pagination-butt">
+                                <button data-id = "${data.next_page}" type="button" id="page-btn" class="btn btn-secondary" style="border-radius= 100%">
+                                    <img src="/images/keyboard_arrow_right-black-18dp.svg" alt="">
+                                </button>
+                            </li>
+                        `
+                    }
+                    $('.pagination').html(pagePrevious)
+                    $("li").on("click", "#page-btn", function () {
+                        const id = $(this).attr('data-id');
+                        getData(id);
+                    })
+                    //--------------------------------- End Pagination ---------------------------------------
+                }).fail(function (jqXHR, textStatus) {
+                    alert("Request Failed Get Data: " + textStatus);
+                })
+            }
+        </script>
+        <%- include('../partials/footer') %>
+            </div>

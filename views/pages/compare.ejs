@@ -1,4 +1,6 @@
 <%- include('../partials/header') %>
+    <style>
+    </style>
 
     <body>
         <!-- Navigation Bar  -->
@@ -46,4 +48,46 @@
             </form>
         </nav><br><br><br>
         <!-- Navigation Bar  -->
+
+        <div class="container compare">
+            <h1>Hasil Perbandingan</h1>
+            <hr>
+            <div class="card card-for-compare"></div>
+        </div>
+
+        <script>
+            const API_URL = "http://localhost:3000/api/index";
+
+            $(document).ready(function () {
+                compareData()
+            })
+            const compareData = () => {
+                let id = location.search.slice(1).split("&")[0].split("=")[1]
+                $.ajax({
+                    url: `${API_URL}/compare/${id.toString()}`,
+                    method: 'GET',
+                    dataType: 'json'
+                }).done(function (data) {
+                    let html = ``
+                    data.forEach(item => {
+                        html += `
+                        <div class="card-body">
+            <div class="card-image" style="width: 276px;height: 183px;"> <img class="card-img-top" src="${item.foto}">
+            </div>
+            <p></p>
+            <h5 class="card-title" style="color: rgb(0, 140, 255);">${item.harga}
+                <small class="negotiable">(Harga Pas)</small>
+            </h5>
+            <p class="card-text">${item.lokasi}</p>
+            <hr>
+            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+        </div>
+        <hr> `
+                    });
+                    $('.card-for-compare').html(html)
+                }).fail(function (jqXHR, textStatus) {
+                    alert("Request Failed Get Data: " + textStatus);
+                })
+            }
+        </script>
         <%- include('../partials/footer') %>

@@ -56,10 +56,12 @@
             border-style: dashed;
 
         }
+
         h1 {
             color: grey;
-            font-family:fantasy ;
+            font-family: fantasy;
         }
+
         .navbars {
             text-decoration: none;
             color: rgba(0, 0, 0, .8);
@@ -123,6 +125,9 @@
     <body>
 
         <script>
+            function id_compare() {
+                getElementById('data-drop')
+            }
             function allowDrop(ev) {
                 ev.preventDefault();
             }
@@ -135,6 +140,7 @@
                 ev.preventDefault();
                 var data = ev.dataTransfer.getData("text");
                 ev.target.appendChild(document.getElementById(data));
+                dropped.push(JSON.parse(data));
             }
             function initialize() {
                 var options = {
@@ -143,16 +149,33 @@
                     mapTypeId: google.maps.MapTypeId.ROADMAP // Tipe ROADMAP
                 };
                 // create map object
-                var map = new google.maps.Map(document.getElementById("googleMap"), options);
-                var marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(-6.9247657, 107.6859478), // longitude latitude
-                    map: map,
-                    title: 'Bandung'
-                });
+                    var map = new google.maps.Map(document.getElementById("googleMap"), options);
+                    var marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(-6.9680659,107.7593002), // longitude latitude
+                        map: map,
+                        title: 'Bandung'
+                    })
             }
             // membuat Event Listener untuk memanggil fungsi initialize pada saat halaman selesai di load
             google.maps.event.addDomListener(window, 'load', initialize);
 
+            function myFunction() {
+                document.getElementById("myDropdown").classList.toggle("show");
+            }
+
+            // Close the dropdown if the user clicks outside of it
+            window.onclick = function (event) {
+                if (!event.target.matches('.dropbtn')) {
+                    var dropdowns = document.getElementsByClassName("dropdown-content");
+                    var i;
+                    for (i = 0; i < dropdowns.length; i++) {
+                        var openDropdown = dropdowns[i];
+                        if (openDropdown.classList.contains('show')) {
+                            openDropdown.classList.remove('show');
+                        }
+                    }
+                }
+            }
         </script>
         <!-- Navigation Bar  -->
         <nav class="navbar navbar-expand-md navbar-white fixed-top bg-white">
@@ -184,21 +207,35 @@
                 </button>
             </form>
             <% if(isLogin){%>
-                <li>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown" id="drp">
-                        <a class="dropdown-item" href="#">Pasang Iklan</a>
-                        <a class="dropdown-item" href="#">Daftar Iklan</a>
+
+                <div class="dropdown">
+                    <button onclick="myFunction()" class="dropbtn btn-link"
+                        style="width: 50px;height: 50px; border-radius: 50px;margin-right: 100px;"><img
+                            src="/images/index.svg" alt="" class="img-thumbnail" style="width: 100px;"></button>
+                    <div id="myDropdown" class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item">Pasang Iklan</a>
+                        <a class="dropdown-item">Daftar Iklan</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="/logout"><img src="/images/power_settings_new-24px.svg" alt="">
                             Log
                             Out</a>
                     </div>
-                    <a href="" class="dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown-menu"
+                </div>
+
+                <!-- <a class="dropbtn" onclick="myFunction()" id="navbarDropdown" role="button" data-toggle="dropdown-menu"
                     aria-haspopup="true" aria-expanded="true">
-                        <img src="/images/danilla.svg" alt="" class="img-thumbnail"
-                            style="width: 50px;height: 50px; border-radius: 50px;margin-right: 100px;">
-                    </a>
-                </li>
+                    <img onclick="myFunction()" src="/images/danilla.svg" alt="" class="img-thumbnail dropbtn"
+                        style="width: 50px;height: 50px; border-radius: 50px;margin-right: 100px;">
+                </a>
+                <div class="dropdown-menu dropdown-content" aria-labelledby="navbarDropdown" id="myDropdown">
+                    <a class="dropdown-item">Pasang Iklan</a>
+                    <a class="dropdown-item">Daftar Iklan</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="/logout"><img src="/images/power_settings_new-24px.svg" alt="">
+                        Log
+                        Out</a>
+                </div> -->
+
                 <% }else{ %>
                     <a class="nav-link" href="/signup"> Daftar</a>
                     <div class="navbar__link-separator"
@@ -215,19 +252,11 @@
 
         <ul class="container" style="margin-top: 30px;" id="container">
 
-            <div class="navbars" style="border-bottom:2px solid  rgb(216, 213, 213);height: 90px;margin-bottom:20px ;">
-                <a class="navbars" style="height:100%;color: grey; border-bottom: 3px solid grey;cursor: pointer;" aria-disabled="true"><span>All</span></a>
-                <a class="navbars" href="/kategori=sewa" style="height:100%;" name="sewa"><span>Sewa</span></a>
-                <a class="navbars" href="/kategori=jual" style="height:100%;"><span>Jual</span></a>
-                <a class="navbars" href="/murah" style="height:100%;"><span>Urutan Harga Termurah</span></a>
-                <a class="navbars" href="/mahal" style="height:100%;"><span>Urutan Harga Termahal</span></a>
-            </div>
-
             <!-- Iklan -->
             <div id="filter"></div>
             <div class="row row-cols-1 row-cols-md-3 g-4" id="daftar-iklan-list">
 
-
+            </div>
             </div><br><br>
             <!-- Iklan -->
 
@@ -243,7 +272,8 @@
             <!-- Drag And Drop Comparation -->
             <div class="col-for-drop-box">
                 <h3>Bandingkan Iklan</h3>
-                <div class="box-drop" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                <div class="box-drop" ondrop="drop(event)" ondragover="allowDrop(event)">
+                </div>
                 <div class="box-drop" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
 
                 <div class="drop-procedure">
@@ -255,9 +285,7 @@
                     <a href="/" type="button" class="btn btn-warning" style="width:50px;margin-left: 10px;">
                         <img src="/images/refresh-24px.svg" alt="">
                     </a>
-                    <a href="/compare" type="button">
-                        <button class="btn btn-dark" style="width:60%;">Bandingkan</button>
-                    </a>
+                    <button class="btn btn-dark" id="compare" type="button" style="width:60%;">Bandingkan</button>
                 </div>
             </div>
             <!-- Drag And Drop Comparation -->
@@ -267,12 +295,13 @@
         <div class="fixed-bottom" style="margin:0px 0px 100px 1800px; opacity: 50%;">
             <button id="backtoback" class="btn btn-secondary">TOP</button>
         </div>
-        <script type="text/javascript">
 
-            const API_URL = "http://localhost:3000/api/index";
+        <script type="text/javascript">
 
             $(document).ready(function () {
                 getData(1)
+                compareData()
+                detailData()
 
                 $('.fixed-bottom').click(function () {
                     $('html,body').animate({
@@ -280,17 +309,67 @@
                     })
                 })
 
-                $(".dropdown-toggle").mouseenter(function () {
-                    $('.dropdown-menu').slideDown().mouseenter(function () {
-                        $(this).slideDown().mouseleave(function () {
-                            $(this).slideUp();
+                $('#kategori-sewa').on("click", function (e) {
+                    $(".navbars-col").html(`
+                    <a class="navbars" href="/" style="height:100%;" disabled><span>All</span></a>
+                <a class="navbars"  style="height:100%; color: grey;border-bottom: 3px solid grey;cursor: pointer;" name="sewa"
+                   ><span>Sewa</span></a>
+                <a class="navbars kategori-jual" type="button" id="kategori-jual" style="height:100%;"><span>Jual</span></a>
+                    `)
+                    $('#kategori-jual').on("click", function (e) {
+                        $(".navbars-col").html(`
+                    <a class="navbars" href="/" style="height:100%;" disabled><span>All</span></a>
+                <a class="navbars" type="button" id="kategori-sewa" style="height:100%;"><span>Sewa</span></a>
+                <a class="navbars"  style="height:100%; color: grey;border-bottom: 3px solid grey;cursor: pointer;" name="jual"
+                   ><span>Jual</span></a>
+                    `)
+                        $('#kategori-sewa').on("click", function (e) {
+                            $(".navbars-col").html(`
+                    <a class="navbars" href="/" style="height:100%;" disabled><span>All</span></a>
+                <a class="navbars"  style="height:100%; color: grey;border-bottom: 3px solid grey;cursor: pointer;" name="sewa"
+                   ><span>Sewa</span></a>
+                <a class="navbars kategori-jual" type="button" id="kategori-jual" style="height:100%;"><span>Jual</span></a>
+                    `)
                         })
                     })
                 })
-
             })
+
+            const compareData = () => {
+                $("#compare").on("click", function () {
+                    let idCollect = []
+                    dropped.forEach(item => {
+                        idCollect.push(item)
+                    });
+                    $.ajax({
+                        url: `${API_URL}/compare/${idCollect.join('+')}`,
+                        method: 'GET',
+                        dataType: 'json'
+                    }).done(function (data) {
+                        window.location.href = `/compare?selectedID=${idCollect.join('+')}`
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request Failed Get Data: " + textStatus);
+                    })
+                })
+            }
+            const detailData = () => {
+                $("#daftar-iklan-list ").on("click", ".detail-button", function () {
+                    const id = $(this).attr('data-id-detail');
+                    $.ajax({
+                        url: `${API_URL}/detail/${id}`,
+                        method: 'GET',
+                        dataType: 'json'
+                    }).done(function (data) {
+                        window.location.href = `/detail?selectedID=${id}`
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request Failed Get Data: " + textStatus);
+                    })
+                })
+            }
+
             const getData = (page) => {
                 var url_catch = $(location).attr('search')
+                console.log(url_catch)
                 $.ajax({
                     url: `${API_URL}/${page}/${url_catch}`,
                     method: 'GET',
@@ -306,8 +385,8 @@
                         rows.forEach((item, index) => {
                             html += `
                             <div class="col">
-                                <div class="card h-100" draggable="true" ondragstart="drag(event)" id="${item.id}"
-                                    style="float: left;" data-id="${item.id}">
+                                <div class="card h-100" draggable="true" ondragstart="drag(event)"
+                                    style="float: left;" id="${item.id}">
                                     <div class="card-body">
                                         <img class="card-img-top" src="${item.foto}">
                                             <p></p>
@@ -325,12 +404,9 @@
                             </div>
                         </div>
                         <div class="card-footer">
-                            <div class="col-auto">
-                                <a class="details-link" href="/detail" style="color: black;float: right;">
-                                    Details<img class="gi gi-arrow-right" src="/images/arrow.png"
-                                        style="width: 15px;">
-                                </a>
-                            </div>
+                            <button class="btn btn-white detail-button" style="color: black;float: right;" type="button" data-id-detail="${item.id}">
+                                Detail<img class="gi gi-arrow-right" src="/images/arrow.png" style="width: 15px;">
+                            </button>
                         </div>
                     </div>
                 </div>

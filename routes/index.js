@@ -8,7 +8,7 @@ var moment = require('moment');
 const isLoggedin = (req, res, next) => {
   if (!req.session.user) {
     res.redirect('/signin')
-  }else{
+  } else {
     next();
   }
   // res.redirect('/')
@@ -19,11 +19,14 @@ const isLoggedin = (req, res, next) => {
 module.exports = function (pool) {
 
   router.get('/', function (req, res, next) {
-    res.status(200).render('index', {
-      user: req.session.user,
-      isLogin: req.session.loggedIn
-    })
-  });
+    pool.query("SELECT iklan.coordinate FROM iklan", (err, data) => {
+      res.status(200).render('index', {
+        coord: data.rows,
+        user: req.session.user,
+        isLogin: req.session.loggedIn
+      })
+    });
+  })
   router.get('/kategori=sewa', function (req, res, next) {
     res.status(200).render('sewa', {
       user: req.session.user,
@@ -44,7 +47,7 @@ module.exports = function (pool) {
   });
   return router
 }
-router.get('/compare',isLoggedin, function (req, res, next) {
+router.get('/compare', function (req, res, next) {
   res.render('compare', {
     title: 'Compare Pages'
   })
@@ -67,7 +70,7 @@ router.get('/signin', function (req, res, next) {
 });
 
 router.get('/logout', function (req, res, next) {
-  req.session.destroy(function(err) {
+  req.session.destroy(function (err) {
     res.redirect('/signin')
   })
 })

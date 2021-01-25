@@ -212,11 +212,12 @@
 
             <div class="navbars" style="border-bottom:2px solid  rgb(216, 213, 213);height: 90px;margin-bottom:20px ;">
                 <a class="navbars" href="/" style="height:100%;" disabled><span>All</span></a>
-                <a class="navbars" style="height:100%; color: grey;border-bottom: 3px solid grey;cursor: pointer;" name="sewa"
-                    aria-disabled="true"><span>Sewa</span></a>
+                <a class="navbars" style="height:100%; color: grey;border-bottom: 3px solid grey;cursor: pointer;"
+                    name="sewa" aria-disabled="true"><span>Sewa</span></a>
                 <a class="navbars" href="/kategori=jual" style="height:100%;"><span>Jual</span></a>
-                <a class="navbars" href="/murah" style="height:100%;"><span>Urutan Harga Termurah</span></a>
-                <a class="navbars" href="/mahal" style="height:100%;"><span>Urutan Harga Termahal</span></a>
+                <a class="navbars" style="height:100%;"><span><select name="" id=""><option value="Jumlah Kamar">Jumlah<input type="integer"></option></select></span>
+                
+                </a>
             </div>
 
             <!-- Iklan -->
@@ -269,6 +270,7 @@
 
             $(document).ready(function () {
                 getData(1)
+                detailData()
 
                 $('.fixed-bottom').click(function () {
                     $('html,body').animate({
@@ -285,6 +287,21 @@
                 })
 
             })
+            const detailData = () => {
+                $("#daftar-iklan-list ").on("click", ".detail-button", function () {
+                    const id = $(this).attr('data-id-detail');
+                    $.ajax({
+                        url: `${API_URL}/detail/${id}`,
+                        method: 'GET',
+                        dataType: 'json'
+                    }).done(function (data) {
+                        window.location.href = `/detail?selectedID=${id}`
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request Failed Get Data: " + textStatus);
+                    })
+                })
+            }
+
             const getData = (page) => {
                 var url_catch = $(location).attr('search')
                 $.ajax({
@@ -321,12 +338,9 @@
                             </div>
                         </div>
                         <div class="card-footer">
-                            <div class="col-auto">
-                                <a class="details-link" href="/detail" style="color: black;float: right;">
-                                    Details<img class="gi gi-arrow-right" src="/images/arrow.png"
-                                        style="width: 15px;">
-                                </a>
-                            </div>
+                            <button class="btn btn-white detail-button" style="color: black;float: right;" type="button" data-id-detail="${item.id}">
+                                Detail<img class="gi gi-arrow-right" src="/images/arrow.png" style="width: 15px;">
+                            </button>
                         </div>
                     </div>
                 </div>

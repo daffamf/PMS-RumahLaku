@@ -13,12 +13,23 @@ module.exports = function (pool) {
     // pool.query('SELECT * FROM iklan', (err, rows) => {
     //     console.log(rows.rows)
     // })
+    router.get('/coor', (req, res) => {
+        var sql = "SELECT coordinate FROM iklan";
+        pool.query(sql, (err, result) => {
+            if (err) {
+                res.send('Gagal')
+            } else {
+                res.json({
+                    data: result.rows
+                })
+            }
+        })
+    })
 
     router.get('/:page', function (req, res, next) {
         const search = req.query.search
-
-        pool.query('SELECT lokasi FROM iklan', (err, data) => {
-            const result = data.rows
+        pool.query('SELECT lokasi FROM iklan', (err, result_lok) => {
+            const result = result_lok.rows
             let lokasi = []
             let isLok = false
             result.forEach(item => {
@@ -27,6 +38,7 @@ module.exports = function (pool) {
                     isLok = true
                 }
             });
+            let coord = []
             const per_page = 3;
             const page = req.params.page || 1;
             const queryObject = url.parse(req.url, true).search;
@@ -68,11 +80,16 @@ module.exports = function (pool) {
             // const sql = 'SELECT * FROM iklan ORDER BY id ASC';
             pool.query(sql, (err, rows) => {
                 if (err) { res.status(400).json({ "error": err.message }); return; }
+                let rowsRes = rows.rows
+                rowsRes.forEach(item => {
+                    coord.push(item.coordinate)
+                });
                 sql += ` ORDER BY id DESC LIMIT 3 OFFSET ${(page - 1) * per_page} `;
                 pool.query(sql, (err, data) => {
                     if (err) { res.status(400).json({ "error": err.message }); return; }
                     // res.json(rowsFilt.rows);
                     res.status(200).json({
+                        coord: coord,
                         data: data.rows,
                         current: page,
                         filter: queryObject,
@@ -184,36 +201,32 @@ module.exports = function (pool) {
         })
     })
 
-    // router.post('/signin', (req, res) => {
-    //     var { email, password } = req.body;
-    //     var sql = `SELECT * FROM users WHERE email = '${email}'`
-    //     pool.query(sql, (err, result) => {
-    //         if (result.rows.length != 0) {
-    //             var sql2 = `SELECT * FROM users WHERE email = '${email}'`
-    //             pool.query(sql2, (err, result) => {
-    //                 bcrypt.compare(password, result.rows[0].password_hash, function (err, result2) {
-    //                     if (result2) {
-    //                         const user = result.rows[0];
-    //                         req.session.user = user;
-    //                         req.session.loggedIn = true;
-    //                         res.json({
-    //                             msg: 'logged_in',
-    //                             session: req.session.user
-    //                         })
-    //                     } else {
-    //                         res.json({
-    //                             msg: 'not_match'
-    //                         })
-    //                     }
-    //                 });
-    //             })
-    //         } else {
-    //             res.json({
-    //                 msg: 'not_match'
-    //             })
-    //         }
-    //     })
-    // })
+    router.get('/compare/:id', (req, res) => {
+        var { id } = req.params;
+        let rep = id.split('+').join(',')
+        var sql = `SELECT * FROM iklan WHERE id IN (${rep})`;
+        pool.query(sql, (err, result) => {
+            if (err) {
+                res.send('Gagal memuat data iklan')
+            } else {
+                res.json(result.rows)
+            }
+        })
+    })
+
+    router.get('/detail/:id', (req, res) => {
+        var { id } = req.params;
+        console.log(id)
+        var sql = `SELECT i.*, u.username, u.no_tlp FROM iklan as i LEFT JOIN users as u ON i.id_users = u.id WHERE i.id = ${id}`;
+        pool.query(sql, (err, result) => {
+            if (err) {
+                res.send('Gagal memuat data iklan')
+            } else {
+                console.log(result.rows)
+                res.json(result.rows)
+            }
+        })
+    })
 
     // router.get('/profil/:id', (req, res) => {
     //     const { id } = req.params;
@@ -418,31 +431,6 @@ module.exports = function (pool) {
     //     })
     // })
 
-    // router.get('/compare/:id', (req, res) => {
-    //     var { id } = req.params;
-    //     let rep = id.split('+').join(',')
-    //     var sql = `SELECT * FROM iklan WHERE id_iklan IN (${rep})`;
-    //     pool.query(sql, (err, result) => {
-    //         if (err) {
-    //             res.send('Gagal memuat data iklan')
-    //         } else {
-    //             res.json(result.rows)
-    //         }
-    //     })
-    // })
-
-    // router.get('/properties-details/:id', (req, res) => {
-    //     var { id } = req.params;
-    //     var sql = `SELECT i.*, m.nama_lengkap, m.no_telp FROM iklan as i LEFT JOIN member as m ON i.id_member = m.id WHERE i.id_iklan = ${id}`;
-    //     pool.query(sql, (err, result) => {
-    //         if (err) {
-    //             res.send('Gagal memuat data iklan')
-    //         } else {
-    //             res.json(result.rows)
-    //         }
-    //     })
-    // })
-
     // router.put('/changepassword/:id', (req, res) => {
     //     var { id } = req.params;
     //     var { password } = req.body;
@@ -484,49 +472,7 @@ module.exports = function (pool) {
     //     })
     // })
 
-    // router.get('/logout', (req, res) => {
-    //     req.session.destroy(function (err) {
-    //         res.json({
-    //             msg: 'success'
-    //         })
-    //     })
-    // })
 
-    // router.post('/signup', (req, res) => {
-    //     var { nama_lengkap, jenis_kelamin, no_telp, tgl_lahir, alamat, email, password_member } = req.body;
-
-    //     var sql = `SELECT * FROM member WHERE email = '${email}'`;
-    //     pool.query(sql, (err, result) => {
-    //         if (err) {
-    //             res.send('Gagal');
-    //         } else {
-    //             if (result.rows.length > 0) {
-    //                 res.json({
-    //                     data: result.rows.length,
-    //                     msg: 'emailexist'
-    //                 });
-    //             } else {
-    //                 bcrypt.hash(password_member, saltRounds, function (err, hash) {
-    //                     if (err) {
-    //                         res.send('Gagal ngehash')
-    //                     }
-    //                     var sql_insert = `INSERT INTO member (nama_lengkap, jenis_kelamin, tgl_lahir, alamat, no_telp, email, password_hash, date_created) VALUES ('${nama_lengkap}', '${jenis_kelamin}', '${tgl_lahir}', '${alamat}', '${no_telp}', '${email}', '${hash}', current_timestamp)`;
-    //                     pool.query(sql_insert, (err, result) => {
-    //                         if (err) {
-    //                             res.json({
-    //                                 msg: 'insertfailed'
-    //                             })
-    //                         } else {
-    //                             res.json({
-    //                                 msg: 'success'
-    //                             });
-    //                         }
-    //                     })
-    //                 });
-    //             }
-    //         }
-    //     })
-    // });
 
     return router;
 }

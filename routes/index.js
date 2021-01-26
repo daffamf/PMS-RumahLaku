@@ -19,14 +19,12 @@ const isLoggedin = (req, res, next) => {
 module.exports = function (pool) {
 
   router.get('/', function (req, res, next) {
-    pool.query("SELECT iklan.coordinate FROM iklan", (err, data) => {
-      res.status(200).render('index', {
-        coord: data.rows,
-        user: req.session.user,
-        isLogin: req.session.loggedIn
-      })
-    });
-  })
+    res.status(200).render('index', {
+      user: req.session.user,
+      isLogin: req.session.loggedIn
+    })
+  });
+
   router.get('/kategori=sewa', function (req, res, next) {
     res.status(200).render('sewa', {
       user: req.session.user,
@@ -42,6 +40,8 @@ module.exports = function (pool) {
 
   router.get('/detail', function (req, res, next) {
     res.render('detail', {
+      user: req.session.user,
+      isLogin: req.session.loggedIn,
       title: 'Express',
     });
   });
@@ -49,6 +49,8 @@ module.exports = function (pool) {
 }
 router.get('/compare', function (req, res, next) {
   res.render('compare', {
+    user: req.session.user,
+    isLogin: req.session.loggedIn,
     title: 'Compare Pages'
   })
 })
@@ -64,23 +66,24 @@ router.get('/signup', function (req, res, next) {
 router.get('/signin', function (req, res, next) {
   res.render('signin', {
     title: 'Express',
-    // user: req.session.user,
-    // isLogin: req.session.loggedIn
+    user: req.session.user,
+    isLogin: req.session.loggedIn
   });
 });
 
 router.get('/logout', function (req, res, next) {
   req.session.destroy(function (err) {
-    res.redirect('/signin')
+    res.redirect('/')
   })
 })
-// router.get('/add_iklan', isLoggedin, (req, res) => {
-//   res.render('add_iklan', {
-//     title: 'Tambah Iklan',
-//     user: req.session.user,
-//     isLogin: req.session.loggedIn
-//   });
-// });
+
+router.get('/add_iklan', (req, res) => {
+  res.render('add_iklan', {
+    title: 'Tambah Iklan',
+    user: req.session.user,
+    isLogin: req.session.loggedIn
+  });
+});
 
 // router.get('/profil', isLoggedin, function (req, res, next) {
 //   res.render('profil', {

@@ -123,87 +123,6 @@
     </style>
 
     <body>
-
-        <script>
-            function allowDrop(ev) {
-                ev.preventDefault();
-            }
-
-            function drag(ev) {
-                ev.dataTransfer.setData("text", ev.target.id);
-            }
-
-            function drop(ev) {
-                ev.preventDefault();
-                var data = ev.dataTransfer.getData("text");
-                ev.target.appendChild(document.getElementById(data));
-            }
-            function initialize() {
-                var options = {
-                    center: new google.maps.LatLng(-6.9147444, 107.6098111), // longitude latitude bandung
-                    zoom: 13,
-                    mapTypeId: google.maps.MapTypeId.ROADMAP // Tipe ROADMAP
-                };
-                // create map object
-                var map = new google.maps.Map(document.getElementById("googleMap"), options);
-                var marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(-6.9247657, 107.6859478), // longitude latitude
-                    map: map,
-                    title: 'Bandung'
-                });
-            }
-            // membuat Event Listener untuk memanggil fungsi initialize pada saat halaman selesai di load
-            google.maps.event.addDomListener(window, 'load', initialize);
-
-        </script>
-        <!-- Navigation Bar  -->
-        <nav class="navbar navbar-expand-md navbar-white fixed-top bg-white">
-            <a class="navbar-brand " href="" style="margin-left: 500px;">
-                <img src="/images/danilla.svg" height="35" class="d-inline-block align-top" alt="">
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
-                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarCollapse">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="/">Home
-                            <span class="sr-only">(current)</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled" href="#">
-                            <%= isLogin ? `Selamat Datang , ${user.username} ` : "Selamat Datang" %>
-                        </a>
-                    </li>
-            </div>
-            <% if(isLogin){%>
-                <li>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown" id="drp">
-                        <a class="dropdown-item" href="#">Pasang Iklan</a>
-                        <a class="dropdown-item" href="#">Daftar Iklan</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/logout"><img src="/images/power_settings_new-24px.svg" alt="">
-                            Log
-                            Out</a>
-                    </div>
-                    <a href="" class="dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown-menu"
-                        aria-haspopup="true" aria-expanded="true">
-                        <img src="/images/danilla.svg" alt="" class="img-thumbnail"
-                            style="width: 50px;height: 50px; border-radius: 50px;margin-right: 100px;">
-                    </a>
-                </li>
-                <% }else{ %>
-                    <a class="nav-link" href="/signup"> Daftar</a>
-                    <div class="navbar__link-separator"
-                        style="border-right: 1px solid #777;height: .8125rem;margin-right: 5px;padding-right: 5px;">
-                    </div>
-                    <a class="nav-link" href="/signin"> Masuk</a>
-                    <% }; %>
-        </nav><br><br><br>
-        <!-- Navigation Bar  -->
-
         <!-- MAP -->
         <div id="googleMap" style="width:100%;height:380px;box-shadow: 0 12px 10px 0 rgba(0,0,0,.2);"></div>
         <!-- MAP -->
@@ -215,9 +134,13 @@
                 <a class="navbars" style="height:100%; color: grey;border-bottom: 3px solid grey;cursor: pointer;"
                     name="sewa" aria-disabled="true"><span>Sewa</span></a>
                 <a class="navbars" href="/kategori=jual" style="height:100%;"><span>Jual</span></a>
-                <a class="navbars" style="height:100%;"><span><select name="" id=""><option value="Jumlah Kamar">Jumlah<input type="integer"></option></select></span>
-                
-                </a>
+                <form class="form-inline mt-2 mt-md-0">
+                    <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search"
+                        name="search" required>
+                    <button class="btn btn-outline-secondary my-2 my-sm-0 serach" type="submit"><img
+                            src="/images/search-24px.svg" alt=""> Search
+                    </button>
+                </form>
             </div>
 
             <!-- Iklan -->
@@ -237,10 +160,11 @@
             <hr>
             <!-- pagination -->
 
-            <!-- Drag And Drop Comparation -->
+               <!-- Drag And Drop Comparation -->
             <div class="col-for-drop-box">
                 <h3>Bandingkan Iklan</h3>
-                <div class="box-drop" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                <div class="box-drop" ondrop="drop(event)" ondragover="allowDrop(event)">
+                </div>
                 <div class="box-drop" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
 
                 <div class="drop-procedure">
@@ -249,12 +173,10 @@
 
                 </div>
                 <div class="col-compare" style="width: 200px;height: 30px;">
-                    <a href="/" type="button" class="btn btn-warning" style="width:50px;margin-left: 10px;">
+                    <a href="" type="button" class="btn btn-warning" style="width:50px;margin-left: 10px;">
                         <img src="/images/refresh-24px.svg" alt="">
                     </a>
-                    <a href="/compare" type="button">
-                        <button class="btn btn-dark" style="width:60%;">Bandingkan</button>
-                    </a>
+                    <button class="btn btn-dark" id="compare" type="button" style="width:60%;">Bandingkan</button>
                 </div>
             </div>
             <!-- Drag And Drop Comparation -->
@@ -319,8 +241,8 @@
                         rows.forEach((item, index) => {
                             html += `
                             <div class="col">
-                                <div class="card h-100" draggable="true" ondragstart="drag(event)" id="${item.id}"
-                                    style="float: left;" data-id="${item.id}">
+                                <div class="card h-100" draggable="true" ondragstart="drag(event)"
+                                    style="float: left;" id="${item.id}">
                                     <div class="card-body">
                                         <img class="card-img-top" src="${item.foto}">
                                             <p></p>
@@ -384,6 +306,24 @@
                     //--------------------------------- End Pagination ---------------------------------------
                 }).fail(function (jqXHR, textStatus) {
                     alert("Request Failed Get Data: " + textStatus);
+                })
+            }
+
+            const compareData = () => {
+                $("#compare").on("click", function () {
+                    let idCollect = []
+                    dropped.forEach(item => {
+                        idCollect.push(item)
+                    });
+                    $.ajax({
+                        url: `${API_URL}/compare/${idCollect.join('+')}`,
+                        method: 'GET',
+                        dataType: 'json'
+                    }).done(function (data) {
+                        window.location.href = `/compare?selectedID=${idCollect.join('+')}`
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request Failed Get Data: " + textStatus);
+                    })
                 })
             }
         </script>

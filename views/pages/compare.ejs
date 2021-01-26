@@ -3,51 +3,6 @@
     </style>
 
     <body>
-        <!-- Navigation Bar  -->
-        <nav class="navbar navbar-expand-md navbar-white fixed-top bg-white">
-            <a class="navbar-brand" href="/">
-                <img src="/images/danilla.svg" height="35" class="d-inline-block align-top" alt="">
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
-                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarCollapse">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="/">Home
-                            <span class="sr-only">(current)</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Daftar Iklan</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
-                            Dropdown
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown" id="drp">
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled" href="#">Wilujeng Sumping</a>
-                    </li>
-            </div>
-            <form action="/signup">
-                <button class="btn btn-dark my-2 my-sm-0" type="submit" style="border-radius: 10px;">
-                    <small style="-webkit-user-select: auto;">
-                        <img src="/images/account_circle-white-18dp.svg" alt="" style="width: 30px;">
-                    </small>
-                    Sign Up
-                </button>
-            </form>
-        </nav><br><br><br>
-        <!-- Navigation Bar  -->
 
         <div class="container compare">
             <h1>Hasil Perbandingan</h1>
@@ -68,6 +23,7 @@
                     method: 'GET',
                     dataType: 'json'
                 }).done(function (data) {
+                    
                     let html = ``
                     data.forEach(item => {
                         html += `

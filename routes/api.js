@@ -216,14 +216,17 @@ module.exports = function (pool) {
 
     router.get('/detail/:id', (req, res) => {
         var { id } = req.params;
-        console.log(id)
         var sql = `SELECT i.*, u.username, u.no_tlp FROM iklan as i LEFT JOIN users as u ON i.id_users = u.id WHERE i.id = ${id}`;
         pool.query(sql, (err, result) => {
+            let coord = result.rows.coordinate
             if (err) {
                 res.send('Gagal memuat data iklan')
             } else {
-                console.log(result.rows)
-                res.json(result.rows)
+                res.json({
+                    data: result.rows,
+                    coord: coord
+                })
+
             }
         })
     })

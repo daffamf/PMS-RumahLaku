@@ -1,18 +1,6 @@
 var express = require('express');
+var {isLoggedin} = require('../helper/util.js')
 var router = express.Router();
-const Swal = require('sweetalert2');
-var session = require('express-session');
-var moment = require('moment');
-
-/* GET home page. */
-const isLoggedin = (req, res, next) => {
-  if (!req.session.user) {
-    res.redirect('/signin')
-  } else {
-    next();
-  }
-  // res.redirect('/')
-}
 
 
 /* GET home page. */
@@ -45,63 +33,50 @@ module.exports = function (pool) {
       title: 'Express',
     });
   });
+
+  router.get('/compare', function (req, res, next) {
+    res.render('compare', {
+      user: req.session.user,
+      isLogin: req.session.loggedIn,
+      title: 'Compare Pages'
+    })
+  })
+
+  router.get('/signup', function (req, res, next) {
+    res.render('signup', {
+      title: 'Express',
+      user: req.session.user,
+      isLogin: req.session.loggedIn
+    });
+  });
+
+  router.get('/signin', function (req, res, next) {
+    res.render('signin', {
+      title: 'Express',
+      user: req.session.user,
+      isLogin: req.session.loggedIn
+    });
+  });
+
+  router.get('/logout', function (req, res, next) {
+    req.session.destroy(function (err) {
+      res.redirect('/')
+    })
+  })
+
+  router.get('/upload',isLoggedin, (req, res) => {
+    res.render('upload', {
+      title: 'Tambah Iklan',
+      user: req.session.user,
+      isLogin: req.session.loggedIn
+    });
+  });
+  router.get('/iklan?id', (req, res) => {
+    res.render('index', {
+      title: 'Tambah Iklan',
+      user: req.session.user,
+      isLogin: req.session.loggedIn
+    });
+  });
   return router
 }
-router.get('/compare', function (req, res, next) {
-  res.render('compare', {
-    user: req.session.user,
-    isLogin: req.session.loggedIn,
-    title: 'Compare Pages'
-  })
-})
-
-router.get('/signup', function (req, res, next) {
-  res.render('signup', {
-    title: 'Express',
-    user: req.session.user,
-    isLogin: req.session.loggedIn
-  });
-});
-
-router.get('/signin', function (req, res, next) {
-  res.render('signin', {
-    title: 'Express',
-    user: req.session.user,
-    isLogin: req.session.loggedIn
-  });
-});
-
-router.get('/logout', function (req, res, next) {
-  req.session.destroy(function (err) {
-    res.redirect('/')
-  })
-})
-
-router.get('/add_iklan', (req, res) => {
-  res.render('add_iklan', {
-    title: 'Tambah Iklan',
-    user: req.session.user,
-    isLogin: req.session.loggedIn
-  });
-});
-
-// router.get('/profil', isLoggedin, function (req, res, next) {
-//   res.render('profil', {
-//     title: 'Profil',
-//     user: req.session.user,
-//     isLogin: req.session.loggedIn
-
-//   });
-// });
-
-// router.get('/details/:id', function (req, res, next) {
-//   const id = req.params.id
-//   res.render('detail', {
-//     title: 'Properties Details',
-//     user: req.session.user,
-//     isLogin: req.session.loggedIn,
-//     id: id
-//   })
-// })
-
-// return router

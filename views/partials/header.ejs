@@ -10,10 +10,16 @@
     integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script src="https://maps.googleapis.com/maps/api/js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+    integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+    crossorigin="anonymous"></script>
+<style>
+  .nav-link{
+    color: #52adf2;
+  }
+</style>
   <script>
-
-
+    // --------------Script for Drag and Drop--------------
     let dropped = []
 
     function allowDrop(ev) {
@@ -49,12 +55,12 @@
         }
       }
     }
+// --------------End script for Drag and Drop--------------
   </script>
-
   <!-- Navigation Bar  -->
   <nav class="navbar navbar-expand-md navbar-white fixed-top bg-white">
-    <a class="navbar-brand " href="" style="margin-left: 500px;">
-      <img src="/images/danilla.svg" height="35" class="d-inline-block align-top" alt="">
+    <a class="navbar-brand " href="" style="margin-left: 400px">
+      <img src="/images/logo-nav.png" height="35" class="d-inline-block align-top" alt="">
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
       aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,13 +69,13 @@
     <div class="collapse navbar-collapse" id="navbarCollapse">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
-          <a class="nav-link" href="/">Home
+          <a class="nav-link" href="/" style="color: #114d7a;">Home
             <span class="sr-only">(current)</span>
           </a>
 
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/add_iklan">Pasang Iklan
+          <a class="nav-link" href="/upload">Pasang Iklan
             <span class="sr-only">(current)</span>
           </a>
         </li>
@@ -80,16 +86,16 @@
       <div class="dropdown">
         <button onclick="myFunction()" class="dropbtn btn-link"
           style="width: 50px;height: 50px; border-radius: 50px;margin-right: 480px;"><img
-            src="/images/account_circle-24px.svg" alt="" class="img-thumbnail" style="width: 100px;"></button>
+            src="/images/icon/account_circle-24px.svg" alt="" class="img-thumbnail" style="width: 100px;"></button>
         <div id="myDropdown" class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" href="#">
-            <img src="/images/account_circle-24px.svg" alt="">
+            <img src="/images/icon/account_circle-24px.svg" alt="">
             <%= user.username%>
           </a>
           <a class="dropdown-item" href="/add_iklan">Pasang Iklan</a>
           <a class="dropdown-item">Daftar Iklan</a>
           <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="/logout"><img src="/images/power_settings_new-24px.svg" alt="">
+          <a class="dropdown-item" href="/logout"><img src="/images/icon/power_settings_new-24px.svg" alt="">
             Log
             Out</a>
         </div>
@@ -99,7 +105,9 @@
         <div class="navbar__link-separator"
           style="border-right: 1px solid #777;height: .8125rem;margin-right: 5px;padding-right: 5px;">
         </div>
-        <a class="nav-link" href="/signin" style="margin-right: 480px;"> Masuk</a>
+        <a class="nav-link" href="/signin" style="margin-right: 380px;"> Masuk</a>
         <% }; %>
   </nav><br><br><br>
   <!-- Navigation Bar  -->
+</head>
+<body>

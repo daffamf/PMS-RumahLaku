@@ -6,17 +6,7 @@
         }
     </style>
     <script>
-        function initMap() {
-            map = new google.maps.Map(document.getElementById("googleMap"), {
-                center: { lat: -6.923735, lng: 107.688739 },
-                zoom: 9,
-            });
-                var marker = new google.maps.Marker({
-                    position: new google.maps.LatLng( -6.923735,107.688739),
-                    map: map
-                });
-        }
-        google.maps.event.addDomListener(window, 'load', initMap);
+
     </script>
 
     <body>
@@ -31,7 +21,8 @@
         </div>
 
         <script type="text/javascript">
-
+            let corX = []
+            let corY = ''
             const API_URL = "http://localhost:3000/api/index";
 
             $(document).ready(function () {
@@ -44,74 +35,98 @@
                     method: 'GET',
                     dataType: 'json'
                 }).done(function (data) {
-                    console.log(data.coord)
                     let rows = data.data
-                    let html = ``
-                    rows.forEach(item => {
-                        html += `
-                        <div class="card">
-                    <div class="card-body">
-                        <div class="card-image" style="width: 276px;height: 183px;"> <img class="card-img-top"
-                                src="${item.foto}"></div>
-                        <p></p>
-                        <h5 class="card-title" style="color: rgb(0, 140, 255);">${item.harga}
-                            <small class="negotiable">${item.isNego ? "(Nego)" : "(Harga Pas)"}</small>
-                        </h5>
-                        <p class="card-text">${item.deskripsi = 'null'  ? "Tidak Ada Deskripsi" : item.deskripsi }</p>
-                        <hr>
-                        <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-                    </div>
+                    let foto = rows.foto.split(',')
+                    let deskripsi = rows.deskripsi
+                    let html = `
+                    <div class="card">
+            <div class="card-body">
+                <div class="card-image" style="width: 276px;height: 183px;"> <img class="card-img-top"
+                        src="/images/upload/${foto[0]}">
                 </div>
+                <p></p>
+                <h5 class="card-title" style="color: rgb(0, 140, 255);">Rp. ${rows.harga}
+                    <small class="negotiable">${rows.isNego ? "(Nego)" : "(Harga Pas)"}</small>
+                </h5>
+                <small class="text-muted">Deskripsi Rumah</small>
+                <p class="card-text">${rows.deskripsi == null ? "Tidak Ada Deskripsinya" : rows.deskripsi}</p>
                 <hr>
-                <div class="form-row" style="margin-top: 30px;">
-                    <div class="col-md-8 mb-3">
-                        <label for="validationTooltip01">Lokasi</label>
-                        <input type="text" class="form-control" id="validationTooltip01" placeholder="First name"
-                            value="${item.lokasi}" readonly>
+                <p class="card-text"><small class="text-muted" id="cor">${rows.coordinate.x}
+                        ${rows.coordinate.y}</small></p>
+            </div>
+        </div>
+        <hr>
+        <div class="form-row" style="margin-top: 30px;">
+            <div class="col-md-8 mb-3">
+                <label for="validationTooltip01">Lokasi</label>
+                <input type="text" class="form-control" id="validationTooltip01" placeholder="First name"
+                    value="${rows.lokasi}" readonly>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="validationTooltipUsername">No. Telepon Pemilik</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="validationTooltipUsernamePrepend"><img
+                                src="/images/icon/phone.svg" alt=""></span>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="validationTooltipUsername">No. Telepon Pemilik</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="validationTooltipUsernamePrepend"><img
-                                        src="/images/phone.svg" alt=""></span>
-                            </div>
-                            <input type="text" class="form-control" id="validationTooltipUsername"
-                                placeholder="Phone Number" aria-describedby="validationTooltipUsernamePrepend" value="${item.no_tlp}" readonly>
-                        </div>
-                    </div>
+                    <input type="text" class="form-control" id="validationTooltipUsername" placeholder="Phone Number"
+                        aria-describedby="validationTooltipUsernamePrepend" value="${rows.no_tlp}" readonly>
                 </div>
-                <div class="form-row">
-                    <div class="col-md-6 mb-3">
-                        <label for="validationTooltip03">City</label>
-                        <input type="text" class="form-control" id="validationTooltip03" placeholder="City" readonly>
-                        <div class="invalid-tooltip">
-                            Please provide a valid city.
-                        </div>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label for="validationTooltip04">Luas Tanah</label>
-                        <input type="text" class="form-control" id="validationTooltip04" placeholder="Luas Tanah"
-                            value="100 m2" readonly>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label for="validationTooltip05">Jumlah Kamar</label>
-                        <input type="text" class="form-control" id="validationTooltip05" placeholder="Jumlah Kamar" value="${item.jml_kamar}" readonly>
-                        <div class="invalid-tooltip">
-                            Please provide a valid zip.
-                        </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-3 mb-3">
+                <label for="validationTooltip04">Luas Tanah</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="validationTooltip04" placeholder="Luas Tanah"
+                        value="${rows.luastanah}" readonly>
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="validationTooltipUsernamePrepend">m2</span>
                     </div>
                 </div>
             </div>
-        <hr> `
-                    });
+            <div class="col-md-2 mb-3">
+                <label for="validationTooltip05">Kamar Tidur</label>
+                <div class="input-group">
+                <input type="text" class="form-control aa" id="validationTooltip05" placeholder="Jumlah Kamar"
+                    value="${rows.jml_kamar}" readonly>
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="validationTooltipUsernamePrepend">Buah</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label for="validationTooltip05">Kamar Mandi</label>
+                <div class="input-group">
+                <input type="text" class="form-control aa" id="validationTooltip05" placeholder="Jumlah Kamar"
+                    value="${rows.kmr_mandi}" readonly>
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="validationTooltipUsernamePrepend">Buah</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>`
                     $('.detail').html(html)
-
-
                 }).fail(function (jqXHR, textStatus) {
                     alert("Request Failed Get Data: " + textStatus);
                 })
             }
+            function initMap() {
+
+                map = new google.maps.Map(document.getElementById("googleMap"), {
+                    center: { lat: -6.923735, lng: 107.688739 },
+                    zoom: 9,
+                });
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(-6.923735, 107.688739),
+                    map: map
+                });
+                console.log(JSON.stringify(corX))
+            }
+            google.maps.event.addDomListener(window, 'load', initMap);
+
+
 
         </script>
         <%- include('../partials/footer') %>

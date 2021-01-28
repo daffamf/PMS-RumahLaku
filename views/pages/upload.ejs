@@ -1,0 +1,156 @@
+<%- include('../partials/header') %>
+    <div class="container">
+        <div class="py-5 text-center">
+            <img class="d-block mx-auto mb-4" src="/images/full-house-wide.png" alt="" width="72" height="72">
+            <h2>Form Tambah Iklan</h2>
+        </div>
+
+        <form ref='uploadForm' id='uploadForm' action="http://localhost:3000/api/index/upload" method="POST"
+            encType="multipart/form-data" class="needs-validation" novalidate>
+
+            <div class="row">
+                <div class="col-md-4 order-md-2 mb-4">
+                    <h4 class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Upload Foto</span>
+                    </h4>
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item d-flex justify-content-between lh-condensed" style="height:300px">
+                        </li>
+                    </ul>
+                    <div class="input-group mb-3">  
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input"  id="upload" name="sampleFile" multiple />
+                            <label class="custom-file-label" for="inputGroupFile01">Pilih Gambar...</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8 order-md-1">
+                    <h4 class="mb-3">Deskripsi Rumah</h4>
+                    <div class="mb-3">
+
+
+                        <label for="alamat">Alamat Lengkap</label>
+                        <input type="text" class="form-control" id="alamat" name="alamat"
+                            placeholder="Jalan Cempaka 2 No.12 RT 01 RW 06 Kelurahan Rancaekek " required>
+                        <div class="invalid-feedback">
+                            Valid first name is required.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="koordinat">Titik Koordinat</label>
+                        <input type="text" class="form-control" id="koordinat" name="koordinat"
+                            placeholder="-6.9247657 , 107.6859478" required>
+                        <small class="text-muted">Salin dari Google maps</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="harga">Harga</label>
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="harga">Rp.</label>
+                            <input type="integer" class="form-control" id="harga" placeholder="10000000" name="harga"
+                                required>
+                            <div class="invalid-feedback">
+                                Masukan Harga
+                            </div>
+                        </div>
+                    </div>
+                    <div class="my-3">
+                        <div class="form-check form-switch">
+                            <input id="sell" name="isNego" type="checkbox" class="form-check-input ">
+                            <label class="form-check-label" name="nego" for="sell">Nego</label>
+                        </div>
+                    </div>
+                    <hr class="mb-4">
+
+                    <label for="luasTanah">Luas Tanah</label>
+                    <div class="row">
+                        <div class="input-group col-md-7 mb-3">
+                            <input type="integer" class="form-control col-md-3" id="luasTanah" name="luasTanah"
+                                required>
+                            <span class="input-group-text" for="luasTanah">m2</span>
+                            <div class="invalid-feedback">
+                                Mohon masukan luas tanah yang valid.
+                            </div>
+                        </div>
+
+                        <div class="col-md-7 mb-3 sm-2">
+                            <label for="kamar">Jumlah Kamar</label>
+                            <input type="number" class="form-control col-md-4" id="kamar" name="kamar" required>
+                            <div class="invalid-feedback">
+                                Mohon masukan jumlah yang valid.
+                            </div>
+
+                        </div>
+                        <div class="col md-7 mb-3 sm-2">
+                            <label for="kmrmandi">Jumlah Kamar Mandi</label>
+                            <input type="number" class="form-control col-md-6" id="kmrmandi" name="kmrmandi" required>
+                        </div>
+                    </div>
+                    <hr class="mb-4">
+                    <h4 class="mb-3">Kategori</h4>
+
+                    <div class="my-3">
+                        <div class="form-check">
+                            <input id="sell" name="kategori" type="radio" class="form-check-input" value="jual" checked
+                                required>
+                            <label class="form-check-label" for="sell">Jual</label>
+                        </div>
+                        <div class="form-check">
+                            <input id="sewa" name="kategori" type="radio" class="form-check-input" value="sewa"
+                                required>
+                            <label class="form-check-label primary" for="sewa">Sewa</label>
+                        </div>
+                    </div>
+
+                    <hr class="mb-4">
+
+                    <div class="my-3">
+                        <div class="form-floating">
+                            <label for="floatingTextarea2">Deskripsi <span class="text-muted">(Optional)</span></label>
+                            <textarea class="form-control" name="desc" placeholder="Tambahkan deskripsi jika perlu"
+                                id="floatingTextarea2" style="height: 100px"></textarea>
+
+
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary btn-lg btn-block" type="submit">Upload</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Upload</span>
+        </div>
+        <div class="custom-file">
+            <input type="file" class="custom-file-input" id="inputGroupFile01">
+            <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        // Example starter JavaScript for disabling form submissions if there are invalid fields
+        (function () {
+            'use strict'
+
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.querySelectorAll('.needs-validation')
+
+            // Loop over them and prevent submission
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
+    <%- include('../partials/footer') %>

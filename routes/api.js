@@ -1,19 +1,19 @@
 var express = require('express');
+var path = require('path');
 var router = express.Router();
 const url = require('url');
-const crypto = require("crypto");
-const upload = require('express-fileupload');
-const FormData = require('form-data')
-const path = require('path')
 let bcrypt = require('bcrypt');
 const saltRounds = 10;
+const fileUpload = require('express-fileupload');
+
+router.use(fileUpload())
 
 module.exports = function (pool) {
 
     // pool.query('SELECT * FROM iklan', (err, rows) => {
     //     console.log(rows.rows)
     // })
-    router.get('/coor', (req, res) => {
+    router.get('/coordinate', (req, res) => {
         var sql = "SELECT coordinate FROM iklan";
         pool.query(sql, (err, result) => {
             if (err) {
@@ -38,7 +38,6 @@ module.exports = function (pool) {
                     isLok = true
                 }
             });
-            let coord = []
             const per_page = 3;
             const page = req.params.page || 1;
             const queryObject = url.parse(req.url, true).search;
@@ -80,16 +79,11 @@ module.exports = function (pool) {
             // const sql = 'SELECT * FROM iklan ORDER BY id ASC';
             pool.query(sql, (err, rows) => {
                 if (err) { res.status(400).json({ "error": err.message }); return; }
-                let rowsRes = rows.rows
-                rowsRes.forEach(item => {
-                    coord.push(item.coordinate)
-                });
                 sql += ` ORDER BY id DESC LIMIT 3 OFFSET ${(page - 1) * per_page} `;
                 pool.query(sql, (err, data) => {
                     if (err) { res.status(400).json({ "error": err.message }); return; }
                     // res.json(rowsFilt.rows);
                     res.status(200).json({
-                        coord: coord,
                         data: data.rows,
                         current: page,
                         filter: queryObject,
@@ -102,74 +96,143 @@ module.exports = function (pool) {
         });
     })
     router.get('/:page/kategori=sewa', function (req, res, next) {
-        const per_page = 3;
-        const page = req.params.page || 1;
-        const queryObject = url.parse(req.url, true).search;
-        let sql = `SELECT * FROM iklan WHERE isJual = false `
-        pool.query(sql, (err, data) => {
-            if (err) return err
-            sql += `ORDER BY id ASC LIMIT 3 OFFSET ${(page - 1) * per_page} `
-            pool.query(sql, (err, rows) => {
-                if (err) { res.status(400).json({ "error": err.message }); return; }
-                // res.json(rowsFilt.rows);
-                res.status(200).json({
-                    data: rows.rows,
-                    current: page,
-                    filter: queryObject,
-                    next_page: parseInt(page) + 1,
-                    previous_page: parseInt(page) - 1,
-                    pages: Math.ceil(data.rows.length / per_page)
-                });
-            });
-        })
-    });
+        const search = req.query.search
+        pool.query('SELECT lokasi FROM iklan WHERE isjual = false', (err, lok_sewa) => {
+            const result_sewa = lok_sewa.rows
+            console.log(result_sewa)
+            let lokasi_sewa = []
+            let isLok_sewa = false
+            result_sewa.forEach(item => {
+                if (search && item.lokasi.toLowerCase().includes(search.toLowerCase())) {
+                    lokasi_sewa.push(item.lokasi)
+                    isLok_sewa = true
+                }
+            }); 
 
-    router.get('/:page/kategori=jual', function (req, res, next) {
-        const per_page = 3;
-        const page = req.params.page || 1;
-        const queryObject = url.parse(req.url, true).search;
-        let sql = `SELECT * FROM iklan WHERE isjual = true `
-        pool.query(sql, (err, data) => {
-            if (err) return err
-            sql += `ORDER BY id ASC LIMIT 3 OFFSET ${(page - 1) * per_page} `
-            pool.query(sql, (err, rows) => {
-                if (err) { res.status(400).json({ "error": err.message }); return; }
-                if (err) { res.status(400).json({ "error": err.message }); return; }
-                // res.json(rowsFilt.rows);
-                res.status(200).json({
-                    data: rows.rows,
-                    current: page,
-                    filter: queryObject,
-                    next_page: parseInt(page) + 1,
-                    previous_page: parseInt(page) - 1,
-                    pages: Math.ceil(data.rows.length / per_page)
+            const per_page = 3;
+            const page = req.params.page || 1;
+            const queryObject = url.parse(req.url, true).search;
+            let params_sewa = [];
+            if (search && Number(search)) {
+                params_sewa.push(`harga = '${search}'`)
+            }
+            if (search && Number(search)) {
+                params_sewa.push(`harga = '${search}'`)
+            }
+            if (search && Number(search)) {
+                params_sewa.push(`id = '${search}'`)
+            }
+            if (search && isLok_sewa) {
+                if (lokasi_sewa.length > 0) {
+                    let locs = ''
+                    for (let i = 0; i < lokasi_sewa.length; i++) {
+                        locs += ` lokasi = '${lokasi_sewa[i]}' ${i == lokasi_sewa.length - 1 ? "" : "OR"}`
+                    }
+                    params_sewa.push(`${locs}`)
+                } else {
+                    params_sewa.push(lokasi_sewa)
+                }
+
+            }
+            var sql = `SELECT * FROM iklan WHERE isJual = false `;
+            if (params_sewa.length > 0) {
+                sql += ` WHERE `;
+                for (let i = 0; i < params_sewa.length; i++) {
+                    sql += `${params_sewa[i]}`;
+                    if (params_sewa.length != i + 1) {
+                        sql += ` OR `;
+                    }
+                }
+            }
+            pool.query(sql, (err, data) => {
+                if (err) return err
+                sql += `ORDER BY id ASC LIMIT 3 OFFSET ${(page - 1) * per_page} `
+                pool.query(sql, (err, rows) => {
+                    if (err) { res.status(400).json({ "error": err.message }); return; }
+                    // res.json(rowsFilt.rows);
+                    res.status(200).json({
+                        data: rows.rows,
+                        current: page,
+                        filter: queryObject,
+                        next_page: parseInt(page) + 1,
+                        previous_page: parseInt(page) - 1,
+                        pages: Math.ceil(data.rows.length / per_page)
+                    });
                 });
-            });
-        })
+            })
+        });
     })
 
-    router.post('/signup', (req, res) => {
-        var { username, no_tlp, email, password } = req.body;
-        bcrypt.hash(password, saltRounds, function (err, hash) {
-            if (err) return res.send('Hashing Gagal')
-            var sql_insert = `INSERT INTO users (username,no_tlp, email, password) VALUES ('${username}','${no_tlp}', '${email}', '${hash}')`;
-            pool.query(sql_insert, (err, result) => {
-                console.log(sql_insert)
-                if (err) {
-                    console.log(err)
-                    res.status(201).json({
-                        msg: 'insertfailed'
-                    })
-                } else {
-                    console.log('success')
-                    res.status(201).json({
-                        msg: 'success'
-                    });
+    router.get('/:page/kategori=jual', function (req, res, next) {
+        const search = req.query.search
+        pool.query('SELECT lokasi FROM iklan WHERE isjual = true', (err, lok_jual) => {
+            const result_jual = lok_jual.rows
+            let lokasi_jual = []
+            let isLok_jual = false
+            result_jual.forEach(item => {
+                if (search && item.lokasi.toLowerCase().includes(search.toLowerCase())) {
+                    lokasi_jual.push(item.lokasi)
+                    isLok_jual = true
                 }
-            })
+            });
+            const per_page = 3;
+            const page = req.params.page || 1;
+            const queryObject = url.parse(req.url, true).search;
+            let params = [];
+            if (search && Number(search)) {
+                params.push(`harga = '${search}'`)
+            }
+            if (search && Number(search)) {
+                params.push(`harga = '${search}'`)
+            }
+            if (search && Number(search)) {
+                params.push(`id = '${search}'`)
+            }
+            if (search && isLok_jual) {
+                if (lokasi_jual.length > 0) {
+                    let locs = ''
+                    for (let i = 0; i < lokasi_jual.length; i++) {
+                        locs += ` lokasi = '${lokasi_jual[i]}' ${i == lokasi_jual.length - 1 ? "" : "OR"}`
+                    }
+                    params.push(`${locs}`)
+                } else {
+                    params.push(lokasi_jual)
+                }
 
+            }
+            if (search) {
+                params.push(`foto = '${search}'`)
+            }
+            var sql = `SELECT * FROM iklan WHERE isJual = true `;
+            if (params.length > 0) {
+                sql += ` WHERE `;
+                for (let i = 0; i < params.length; i++) {
+                    sql += `${params[i]}`;
+                    if (params.length != i + 1) {
+                        sql += ` OR `;
+                    }
+                }
+            }
+            pool.query(sql, (err, data) => {
+                if (err) return err
+                sql += `ORDER BY id ASC LIMIT 3 OFFSET ${(page - 1) * per_page} `
+                pool.query(sql, (err, rows) => {
+                    if (err) { res.status(400).json({ "error": err.message }); return; }
+                    // res.json(rowsFilt.rows);
+                    res.status(200).json({
+                        data: rows.rows,
+                        current: page,
+                        filter: queryObject,
+                        next_page: parseInt(page) + 1,
+                        previous_page: parseInt(page) - 1,
+                        pages: Math.ceil(data.rows.length / per_page)
+                    });
+                });
+            })
         });
-    });
+    })
+
+
     router.post('/signin', (req, res) => {
         var { email, password } = req.body;
         var sql = `SELECT * FROM users WHERE email = '${email}'`;
@@ -218,12 +281,13 @@ module.exports = function (pool) {
         var { id } = req.params;
         var sql = `SELECT i.*, u.username, u.no_tlp FROM iklan as i LEFT JOIN users as u ON i.id_users = u.id WHERE i.id = ${id}`;
         pool.query(sql, (err, result) => {
-            let coord = result.rows.coordinate
+            let coord = result.rows[0].coordinate
+            console.log(coord)
             if (err) {
                 res.send('Gagal memuat data iklan')
             } else {
                 res.json({
-                    data: result.rows,
+                    data: result.rows[0],
                     coord: coord
                 })
 
@@ -231,249 +295,53 @@ module.exports = function (pool) {
         })
     })
 
-    // router.get('/profil/:id', (req, res) => {
-    //     const { id } = req.params;
-    //     console.log(id)
-    //     var sql = `SELECT * FROM member WHERE id = ${id}`;
-    //     pool.query(sql, (err, result) => {
-    //         if (err) {
-    //             res.json({
-    //                 msg: err
-    //             });
-    //         } else {
-    //             res.json(result.rows);
-    //         }
-    //     })
-    // })
+    router.post('/upload', function (req, res) {
+        var { alamat, harga, isNego, luasTanah, koordinat, desc, id_users, kmrmandi, kamar, kategori } = req.body;
 
-    // router.put('/profil/:id', (req, res) => {
-    //     var { id } = req.params;
-    //     var { nama_lengkap, jenis_kelamin, no_telp, tgl_lahir, alamat, email } = req.body;
+        function makeid(length) {
+            var result = '';
+            var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            var charactersLength = characters.length;
+            for (var i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+            return result;
+        }
 
-    //     var sql = `UPDATE member SET nama_lengkap = '${nama_lengkap}', jenis_kelamin = '${jenis_kelamin}', no_telp = '${no_telp}', tgl_lahir = '${tgl_lahir}', alamat = '${alamat}', email = '${email}' WHERE id = ${id}`;
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
 
-    //     pool.query(sql, (err, result) => {
-    //         if (err) {
-    //             res.send('Gagal');
-    //         }
-    //         res.json({
-    //             msg: 'Berhasil update Data'
-    //         })
-    //     })
-    // })
+        today = mm + '_' + yyyy;
 
-    // router.get('/iklan', (req, res) => {
-    //     const per_page = 3;
-    //     const page = req.params.page || 1;
-    //     var sql_all = `SELECT * FROM iklan ORDER BY created_date DESC`;
-    //     pool.query(sql_all, (err, result_all) => {
-    //         if (err) { res.status(400).json({ "error": err.message }); return; }
-    //         var sql = `SELECT * FROM iklan ORDER BY created_date DESC LIMIT 3`;
-    //         pool.query(sql, (err, result) => {
-    //             if (err) {
-    //                 res.send('Gagal memuat data')
-    //             } else {
-    //                 res.json({
-    //                     data: result.rows,
-    //                     current: page,
-    //                     pages: Math.ceil(result_all.rows.length / per_page),
-    //                     next_page: parseInt(page) + 1,
-    //                     previous_page: parseInt(page) - 1
-    //                 })
-    //             }
-    //         })
-    //     })
-    // })
+        let __dirname = '/home/rubicamp/Batch24/pms/public/images/upload/'
 
-    // router.get('/iklan/:page/:harga/:kategori', (req, res) => {
-    //     const per_page = 3;
-    //     const page = req.params.page || 1;
-    //     const harga = req.params.harga;
-    //     const kategori = req.params.kategori;
+        if (!req.files || Object.keys(req.files).length === 0) {
+            return res.send("GAgal")
+        }
+        var filename = []
+        let sizeFiles = Object.keys(req.files.sampleFile).length;
+        for (let i = 0; i < sizeFiles; i++) {
+            // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+            let foto = req.files.sampleFile[i];
+            filename.push(today + '_' + makeid(10) + i + '.jpg');
+            // Use the mv() method to place the file somewhere on your server
+            foto.mv(path.join(__dirname + filename[i]), function (err) {
+                if (err) return err
+            })
+        }
 
-    //     var sql_all = `SELECT * FROM iklan ${kategori !== 'def' ? 'WHERE kategori = ' + kategori : ''} ORDER BY ${harga !== 'def' ? 'harga' : 'created_date'} ${harga !== 'def' ? harga : 'DESC'}`;
-    //     pool.query(sql_all, (err, result_all) => {
-    //         if (err) { res.status(400).json({ "error": err.message }); return; }
-    //         var sql = `SELECT * FROM iklan ${kategori !== 'def' ? 'WHERE kategori = ' + kategori : ''} ORDER BY ${harga !== 'def' ? 'harga' : 'created_date'} ${harga !== 'def' ? harga : 'DESC'} LIMIT 3 OFFSET ${(page - 1) * per_page}`;
-    //         console.log(sql)
-    //         pool.query(sql, (err, result) => {
-    //             if (err) {
-    //                 res.send('Gagal memuat data')
-    //             } else {
-    //                 res.json({
-    //                     data: result.rows,
-    //                     current: page,
-    //                     pages: Math.ceil(result_all.rows.length / per_page),
-    //                     next_page: parseInt(page) + 1,
-    //                     previous_page: parseInt(page) - 1
-    //                 })
-    //             }
-    //         })
-    //     })
-    // })
-
-    // router.post('/iklan', (req, res) => {
-    //     var { alamat, harga, ukuran, coordinate, deskripsi, id_member, kategori, kamar_mandi, kamar_tidur, sertifikat, lantai } = req.body;
-
-    //     function makeid(length) {
-    //         var result = '';
-    //         var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    //         var charactersLength = characters.length;
-    //         for (var i = 0; i < length; i++) {
-    //             result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    //         }
-    //         return result;
-    //     }
-    //     var today = new Date();
-    //     var dd = String(today.getDate()).padStart(2, '0');
-    //     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-    //     var yyyy = today.getFullYear();
-
-    //     today = mm + '_' + yyyy;
-
-    //     if (!req.files || Object.keys(req.files).length === 0) {
-    //         return res.status(400).send('No files were uploaded.');
-    //     }
-    //     var filename = []
-    //     let sizeFiles = Object.keys(req.files.file).length;
-    //     for (let i = 0; i < sizeFiles; i++) {
-    //         // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
-    //         let foto = req.files.file[i];
-    //         filename.push(today + '_' + makeid(10) + i + '.jpg');
-    //         // Use the mv() method to place the file somewhere on your server
-    //         foto.mv(path.join(__dirname, '..', 'public', 'images', 'uploads', filename[i]), function (err) {
-    //             if (err) return res.status(500).send(err);
-    //         });
-    //     }
-
-    //     const filenameRen = filename.join(',');
-
-    //     var sql = `INSERT INTO iklan (alamat, harga, ukuran, coordinate, deskripsi, gambar, id_member, status, kategori, created_date, kamar_mandi, kamar_tidur, sertifikat, lantai) VALUES ('${alamat}', ${harga}, ${ukuran}, '${coordinate}', '${deskripsi}', '${filenameRen}', ${id_member}, 0, ${kategori}, current_timestamp, ${kamar_mandi}, ${kamar_tidur}, '${sertifikat}', '${lantai}')`
-    //     pool.query(sql, (err, result) => {
-    //         if (err) {
-    //             res.send('Gagal')
-    //         } else {
-    //             res.json({
-    //                 msg: 'success'
-    //             })
-    //         }
-    //     })
-    // })
-
-    // router.put('/changepp/:id', (req, res) => {
-    //     var { id } = req.params;
-
-    //     function makeid(length) {
-    //         var result = '';
-    //         var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    //         var charactersLength = characters.length;
-    //         for (var i = 0; i < length; i++) {
-    //             result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    //         }
-    //         return result;
-    //     }
-    //     var today = new Date();
-    //     var dd = String(today.getDate()).padStart(2, '0');
-    //     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-    //     var yyyy = today.getFullYear();
-
-    //     today = mm + '_' + yyyy;
-
-    //     if (!req.files || Object.keys(req.files).length === 0) {
-    //         return res.status(400).send('No files were uploaded.');
-    //     }
-
-    //     // // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
-    //     let foto = req.files.file;
-    //     let filename = today + '_' + makeid(10) + '0' + '.jpg';
-
-    //     // // Use the mv() method to place the file somewhere on your server
-    //     foto.mv(path.join(__dirname, '..', 'public', 'images', 'uploads', 'users', filename), function (err) {
-    //         if (err) return res.status(500).send(err);
-    //     });
-
-    //     console.log(filename)
-
-    //     var sql = `UPDATE member SET gambar = '${filename}' WHERE id = ${id}`;
-    //     console.log(sql)
-    //     pool.query(sql, (err, result) => {
-    //         if (err) {
-    //             res.send('Gagal')
-    //         } else {
-    //             res.json({
-    //                 msg: 'success'
-    //             })
-    //         }
-    //     })
-    // })
-
-    // router.post('/cekoldpass/:id', (req, res) => {
-    //     var { id } = req.params;
-    //     var { password_hash } = req.body;
-
-    //     var sql = `SELECT password_hash FROM member WHERE id = ${id}`;
-    //     console.log(sql)
-    //     pool.query(sql, (err, result) => {
-    //         if (err) {
-    //             res.send('Query failed')
-    //         } else {
-    //             console.log()
-    //             bcrypt.compare(password_hash, result.rows[0].password_hash, function (err, hasil) {
-    //                 // result == true
-    //                 if (hasil) {
-    //                     res.json({
-    //                         msg: 'true'
-    //                     })
-    //                 } else {
-    //                     res.json({
-    //                         msg: 'false'
-    //                     })
-    //                 }
-    //             });
-    //         }
-    //     })
-    // })
-
-    // router.put('/changepassword/:id', (req, res) => {
-    //     var { id } = req.params;
-    //     var { password } = req.body;
-
-    //     let myKey = crypto.createCipher("aes-128-cbc", "mypassword");
-    //     let myStr = myKey.update(password, "utf8", "hex");
-    //     myStr += myKey.final("hex");
-
-    //     const hashPass = myStr;
-    //     var sql = `SELECT password_hash FROM member WHERE id = ${id}`;
-    //     pool.query(sql, (err, result) => {
-    //         if (result.rows.password_hash === hashPass) {
-    //             var sql_update = `UPDATE member SET password_hash = '${hashPass}' WHERE id = ${id}`;
-    //             pool.query(sql_update, (err, result) => {
-    //                 if (err) res.send('Gagal');
-    //                 res.json({
-    //                     msg: 'Berhasil update Password'
-    //                 })
-    //             })
-    //         } else {
-    //             res.json({
-    //                 msg: 'Password lama Salah.'
-    //             })
-    //         }
-    //     })
-
-    // })
-
-    // router.get('/coordinate', (req, res) => {
-    //     var sql = "SELECT coordinate FROM iklan";
-    //     pool.query(sql, (err, result) => {
-    //         if (err) {
-    //             res.send('Gagal')
-    //         } else {
-    //             res.json({
-    //                 data: result.rows
-    //             })
-    //         }
-    //     })
-    // })
+        const filenameRen = filename.join(',');
+        var sql = `INSERT INTO iklan (lokasi, coordinate,jml_kamar, isnego,foto,harga,isjual,  id_users,luastanah, deskripsi,created_date, kmr_mandi) VALUES ('${alamat}', '${koordinat}', ${kamar}, ${isNego == 'on' ? true : false},'${filenameRen}', ${harga}, ${kategori == 'jual' ? true : false}, 7, ${luasTanah}, '${desc}', current_timestamp, ${kmrmandi})`
+        pool.query(sql, (err, result) => {
+            if (err) {
+                console.log(err)
+            } else {
+                res.redirect('/')
+            }
+        })
+    });
 
 
 

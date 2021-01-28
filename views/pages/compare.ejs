@@ -16,6 +16,7 @@
             $(document).ready(function () {
                 compareData()
             })
+            
             const compareData = () => {
                 let id = location.search.slice(1).split("&")[0].split("=")[1]
                 $.ajax({

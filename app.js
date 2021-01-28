@@ -16,7 +16,8 @@ const pool = new Pool({
   database: 'rumah-laku',
   port: 5432,
 })
-// pool.query('SELECT * FROM iklan',(err,rows)=>{
+
+// pool.query('SELECT users.*,iklan.* FROM users,iklan',(err,rows)=>{
 // console.log(rows.rows)
 // })
 
@@ -38,11 +39,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
-  user:[],
-  secret:"It's a secret",
-  cookie: { maxAge: 60000 },
+  user: [],
+  secret: "It's a secret",
   resave: false,    // forces the session to be saved back to the store
-  saveUninitialized: false 
+  saveUninitialized: false
 }))
 
 app.use('/', indexRouter);
@@ -51,18 +51,18 @@ app.use('/api/index', apiRouter);
 
 app.use(fileUpload());
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.locals.user = req.session.user;
   next();
 });
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

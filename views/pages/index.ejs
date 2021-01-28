@@ -1,7 +1,7 @@
 <%- include('../partials/header') %>
     <style>
         .box-drop {
-            width: 380px;
+            width: 360px;
             height: 460px;
             border: 2px solid rgb(161, 156, 156);
             border-style: dashed;
@@ -30,6 +30,11 @@
             height: 600px;
             border: 1px solid rgb(231, 230, 230);
         }
+
+        /* 
+        .date {
+            padding-top: 100px;
+        } */
 
         .drop-procedure {
             float: right;
@@ -60,6 +65,10 @@
         h1 {
             color: grey;
             font-family: fantasy;
+        }
+
+        .lokasi-text:hover {
+            color: #eaeaea;
         }
 
         .navbars {
@@ -123,7 +132,40 @@
     </style>
 
     <script>
-       
+
+        $(document).ready(function () {
+            $.ajax({
+                url: `${API_URL}/coordinate`,
+                method: 'GET',
+                dataType: 'json'
+            }).done(function (data) {
+                let map;
+                let corArray = []
+                // console.log(data)
+                var coordsArray = data.data;
+                for (let i = 0; i < coordsArray.length; i++) {
+                    var coords = coordsArray[i];
+                    corArray.push(coords.coordinate.x + ', ' + coords.coordinate.y);
+                }
+
+                map = new google.maps.Map(document.getElementById("googleMap"), {
+                    center: { lat: -6.923735, lng: 107.688739 },
+                    zoom: 12,
+                });
+                for (let i = 0; i < corArray.length; i++) {
+                    let splitCoord = corArray[i].split(", ");
+                    var marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(parseFloat(splitCoord[0]), parseFloat(splitCoord[1])),
+                        map: map
+                    });
+                }
+
+                google.maps.event.addDomListener(window, 'load', $(this));
+                // console.log(corArray)
+            }).fail(function (textStatus, jqXHR) {
+            })
+        })
+
     </script>
 
     <body>
@@ -160,8 +202,7 @@
             <!-- Drag And Drop Comparation -->
             <div class="col-for-drop-box">
                 <h3>Bandingkan Iklan</h3>
-                <div class="box-drop" ondrop="drop(event)" ondragover="allowDrop(event)">
-                </div>
+                <div class="box-drop" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
                 <div class="box-drop" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
 
                 <div class="drop-procedure">
@@ -171,7 +212,7 @@
                 </div>
                 <div class="col-compare" style="width: 200px;height: 30px;">
                     <a href="/" type="button" class="btn btn-warning" style="width:50px;margin-left: 10px;">
-                        <img src="/images/refresh-24px.svg" alt="">
+                        <img src="/images/icon/refresh-24px.svg" alt="">
                     </a>
                     <button class="btn btn-dark" id="compare" type="button" style="width:60%;">Bandingkan</button>
                 </div>
@@ -185,28 +226,12 @@
         </div>
 
         <script type="text/javascript">
-        function initMap() {
-            map = new google.maps.Map(document.getElementById("googleMap"), {
-                center: { lat: -6.923735, lng: 107.688739 },
-                zoom: 12,
-            });
-
-            for (let i = 0; i < corArray.length; i++) {
-                let splitCoord = corArray[i].split(", ");
-                var marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(parseFloat(splitCoord[0]), parseFloat(splitCoord[1])),
-                    map: map
-                });
-            }
-        }
-        google.maps.event.addDomListener(window, 'load', initMap);
 
             const API_URL = `http://localhost:3000/api/index`
             $(document).ready(function () {
                 getData(1)
                 compareData()
                 detailData()
-                coordinate()
 
                 $('.fixed-bottom').click(function () {
                     $('html,body').animate({
@@ -257,10 +282,17 @@
                     aria-disabled="true"><span>Sewa</span></a>
                 <a class="navbars kategori-jual" type="button" href="/kategori=jual" style="height:100%;"><span>Jual</span></a>
                 <form class="form-inline mt-2 mt-md-0">
-                     <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" name="search"
+                     <input class="form-control mr-sm-2" list="datalistOptions" type="text" placeholder="Search" aria-label="Search" name="search"
                     required>
+                    <datalist id="datalistOptions">
+                        <option value="San Francisco">
+                        <option value="New York">
+                        <option value="Seattle">
+                        <option value="Los Angeles">
+                        <option value="Chicago">
+                        </datalist>
                  <button class="btn btn-outline-secondary my-2 my-sm-0 serach" type="submit"
-            ><img src="/images/search-24px.svg" alt=""> Search
+            ><img src="/images/icon/search-24px.svg" alt=""> Search
                  </button>
              </form>
 
@@ -272,34 +304,34 @@
                     dataType: 'json'
                 }).done(function (data) {
                     let filter = JSON.stringify(data.filter)
-                    $("#filter").html(`${filter == 'null' ? `<h1>IKLAN TERAKHIR</h1><hr>` : `<h1><img src="/images/search-24px.svg" alt=""> Pencarian Untuk '${filter.slice(9, filter.length - 1)}'</h1><hr>`}`)
+                    $("#filter").html(`${filter == 'null' ? `<h1>IKLAN TERAKHIR</h1><hr>` : `<h1>Pencarian Untuk '${filter.slice(9, filter.length - 1)}'</h1><hr>`}`)
                     let rows = data.data
                     let html = ``
                     if (rows.length == 0) {
-                        html += `<h3 class="text-muted col-7 col-md-12"><img src="/images/search_off-24px.svg"> Tidak ditemukan</h3>`
+                        html += `<h3 class="text-muted col-7 col-md-12"><img src="/images/icon/search_off-24px.svg"> Tidak ditemukan</h3>`
                     } else {
                         rows.forEach((item, index) => {
+                            let foto = item.foto.split(',')
                             html += `
                             <div class="col">
                                 <div class="card h-100" draggable="true" ondragstart="drag(event)"
                                     style="float: left;" id="${item.id}">
                                     <div class="card-body">
-                                        <img class="card-img-top" src="${item.foto}">
-                                            <p></p>
+                                        <img class="card-img-top" src="/images/upload/${foto[0]}">
                                         <div>
-                                        <h5 class="card-title" style="color: rgb(0, 140, 255);">${item.harga} IDR
+                                        <small class="text-muted">${item.isjual ? "Dijual" : "Disewa"}</small>
+                                        <h5 class="card-title" style="color: #52adf2;">${item.harga} IDR
                                     
-                                        <small class="negotiable">${item.isNego ? "(Nego)" : "(Harga Pas)"}
+                                        <small class="negotiable">${item.isNego ? "(Nego)" : "(Harga Pas)"}</small>
                                            
-                                        </small>
+                                        
                                 </h5>
-                                <p class="card-text">Jumlah Kamar : ${item.jml_kamar}
-                                    
-                                </p>
-                                <p class="card-text"><img src="/images/pin_drop-24px.svg"> ${item.lokasi}</p>
+                                <p class="card-text text-muted lokasi-text"><img src="/images/icon/pin_drop-24px.svg"> ${item.lokasi.toUpperCase()}</p>
+                                <small class="text-muted date"><img src="/images/icon/clo.png" alt="" width="20px" height="20px"> ${item.created_date.slice(0, 10)}</small>
                             </div>
-                        </div>
+                            </div>
                         <div class="card-footer">
+                            
                             <button class="btn btn-white detail-button" style="color: black;float: right;" type="button" data-id-detail="${item.id}">
                                 Detail<img class="gi gi-arrow-right" src="/images/arrow.png" style="width: 15px;">
                             </button>
@@ -321,7 +353,7 @@
                         pagePrevious += `
                             <li id="pagination-butt">
                                 <button data-id = "${data.previous_page}" type="button" id="page-btn"  class="btn btn-secondary">
-                                    <img src="/images/keyboard_arrow_left-black-18dp.svg" alt="">
+                                    <img src="/images/icon/keyboard_arrow_left-black-18dp.svg" alt="">
                                 </button>
                             </li> `
                     }
@@ -332,7 +364,7 @@
                         pagePrevious += `
                             <li id="pagination-butt">
                                 <button data-id = "${data.next_page}" type="button" id="page-btn" class="btn btn-secondary" style="border-radius= 100%">
-                                    <img src="/images/keyboard_arrow_right-black-18dp.svg" alt="">
+                                    <img src="/images/icon/keyboard_arrow_right-black-18dp.svg" alt="">
                                 </button>
                             </li>
                         `
@@ -347,24 +379,6 @@
                 }).fail(function (jqXHR, textStatus) {
                     alert("Request Failed Get Data: " + textStatus);
                 })
-            }
-
-            const coordinate = () => {
-                $.ajax({
-                    url: `${API_URL}/coor`,
-                    method: 'GET',
-                    dataType: 'json'
-                }).done(function (data) {
-                    var corArray = []
-                    var coordsArray = data.data;
-                    for (let i = 0; i < coordsArray.length; i++) {
-                        var coords = coordsArray[i];
-                        corArray.push(coords.coordinate.x + ', ' + coords.coordinate.y);
-
-                    } console.log(corArray)
-                }).fail(function (textStatus, jqXHR) {
-                })
-
             }
         </script>
         <%- include('../partials/footer') %>

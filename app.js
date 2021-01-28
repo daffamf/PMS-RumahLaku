@@ -40,9 +40,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
   user: [],
-  secret: "It's a secret",
-  resave: false,    // forces the session to be saved back to the store
-  saveUninitialized: false
+  secret: "It's a secret"
 }))
 
 app.use('/', indexRouter);

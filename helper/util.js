@@ -4,6 +4,6 @@ const isLoggedin = (req, res, next) => {
     } else {
       next();
     }
-    res.redirect('/')
+    // res.redirect('/')
   }
  module.exports = { isLoggedin }  

@@ -10,19 +10,21 @@
             <div class="form-grid">
                 <hr>
                 <a class="navbar-brand" href="/">
-                    <img src="/images/full-house-wide.png" height="35" class="d-inline-block align-top" alt="">
+                    <img src="/images/ERK Logo black.png" height="35" class="d-inline-block align-top" alt="">
                 </a>
                 <hr>
 
                 <form id="signup-form" action="" method="POST">
                     <div class="form-group">
                         <label>Nama Pengguna</label>
-                        <input placeholder="Nama Anda" class="form-control" type="text" name="username" id="username" required>
+                        <input placeholder="Nama Anda" class="form-control" type="text" name="username" id="username"
+                            required>
                     </div>
 
                     <div class="form-group">
                         <label>No. Telepon</label>
-                        <input placeholder="+CountryCodePhone" class="form-control" type="text" name="no_tlp" id="no_tlp">
+                        <input placeholder="+CountryCodePhone" class="form-control" type="text" name="no_tlp"
+                            id="no_tlp">
                     </div>
 
                     <div class="form-group">
@@ -31,12 +33,14 @@
                     </div>
                     <div class="form-group">
                         <label>Password</label>
-                        <input placeholder="Password" class="form-control" type="password" name="password" id="password">
+                        <input placeholder="Password" class="form-control" type="password" name="password"
+                            id="password">
                     </div>
                     <div class="form-group">
-                        <input placeholder="Ketik Ulang Password" class="form-control" type="password" name="password" id="password">
+                        <input placeholder="Ketik Ulang Password" class="form-control" type="password" name="password"
+                            id="password">
                     </div>
-                        <button class="btn btn-dark btn-lg btn-block" type="submit">Daftar</button>
+                    <button class="btn btn-dark btn-lg btn-block" type="submit">Daftar</button>
                     <hr>
                 </form>
                 <div>
@@ -46,7 +50,7 @@
         </div>
 
         <script type="text/javascript">
-        const API_URL = `http://localhost:3000/api/index`
+            const API_URL = `http://localhost:3000/api/index`
 
             $(document).ready(function () {
                 regis();
@@ -68,7 +72,16 @@
                             password: password
                         }
                     }).done(function (data) {
-                       window.location.href="/signin"
+                        console.log(data)
+                        if (data.msg == 'emailexist') {
+                            alert("Email sudah terdaftar")
+                        }
+                        else if (data.msg == "success") {
+                            alert("Berhasil")
+                            window.location.href = "/signin"
+                        } else {
+                            alert("Email dan/atau Password Salah")
+                        }
                     }).fail(function (jqXHR, textStatus) {
                         alert("Request failed get data: " + textStatus);
                     })

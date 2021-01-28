@@ -304,7 +304,7 @@
                     dataType: 'json'
                 }).done(function (data) {
                     let filter = JSON.stringify(data.filter)
-                    $("#filter").html(`${filter == 'null' ? `<h1>IKLAN TERAKHIR</h1><hr>` : `<h1>Pencarian Untuk '${filter.slice(9, filter.length - 1)}'</h1><hr>`}`)
+                    $("#filter").html(`${filter == 'null' ? `<h1>IKLAN TERAKHIR</h1><hr>` : `<h1>Pencarian Untuk '${filter.slice(9, filter.length - 1)}'<a href="/"><button class="btn btn-secondary">Clear</button></a></h1><hr>`}`)
                     let rows = data.data
                     let html = ``
                     if (rows.length == 0) {

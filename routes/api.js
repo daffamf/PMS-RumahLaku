@@ -107,7 +107,7 @@ module.exports = function (pool) {
                     lokasi_sewa.push(item.lokasi)
                     isLok_sewa = true
                 }
-            }); 
+            });
 
             const per_page = 3;
             const page = req.params.page || 1;
@@ -318,31 +318,86 @@ module.exports = function (pool) {
         let __dirname = '/home/rubicamp/Batch24/pms/public/images/upload/'
 
         if (!req.files || Object.keys(req.files).length === 0) {
-            return res.send("GAgal")
+            return res.send("Gagal")
         }
         var filename = []
         let sizeFiles = Object.keys(req.files.sampleFile).length;
-        for (let i = 0; i < sizeFiles; i++) {
-            // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
-            let foto = req.files.sampleFile[i];
-            filename.push(today + '_' + makeid(10) + i + '.jpg');
+        console.log( sizeFiles.length)
+        if (!sizeFiles.length) {
+            sampleFile = req.files.sampleFile;
+            filename.push(today + '_' + makeid(10)+ 1 + '.jpg');
+            uploadPath = __dirname + filename
             // Use the mv() method to place the file somewhere on your server
-            foto.mv(path.join(__dirname + filename[i]), function (err) {
-                if (err) return err
+            sampleFile.mv(uploadPath, function (err) {
+                if (err)
+                    return res.status(500).send(err);
+            })
+            var sql1 = `INSERT INTO iklan (lokasi, coordinate,jml_kamar, isnego,foto,harga,isjual,  id_users,luastanah, deskripsi,created_date, kmr_mandi) VALUES ('${alamat}', '${koordinat}', ${kamar}, ${isNego == 'on' ? true : false},'${filename}', ${harga}, ${kategori == 'jual' ? true : false}, ${Number(id_users)}, ${luasTanah}, '${desc}', current_timestamp, ${kmrmandi})`
+            pool.query(sql1, (err, result) => {
+                if (err) {
+                    console.log(err)
+                } else {
+                    res.redirect('/')
+                }
+            })
+        } else {
+            for (let i = 0; i < sizeFiles; i++) {
+                // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+                let foto = req.files.sampleFile[i];
+                filename.push(today + '_' + makeid(10) + i + '.jpg');
+                // Use the mv() method to place the file somewhere on your server
+                foto.mv(path.join(__dirname + filename[i]), function (err) {
+                    if (err) return err
+                })
+            }
+            const filenameRen = filename.join(',');
+            var sql2 = `INSERT INTO iklan (lokasi, coordinate,jml_kamar, isnego,foto,harga,isjual,  id_users,luastanah, deskripsi,created_date, kmr_mandi) VALUES ('${alamat}', '${koordinat}', ${kamar}, ${isNego == 'on' ? true : false},'${filenameRen}', ${harga}, ${kategori == 'jual' ? true : false}, ${Number(id_users)}, ${luasTanah}, '${desc}', current_timestamp, ${kmrmandi})`
+            pool.query(sql2, (err, result) => {
+                if (err) {
+                    console.log(err)
+                } else {
+                    res.redirect('/')
+                }
             })
         }
 
-        const filenameRen = filename.join(',');
-        var sql = `INSERT INTO iklan (lokasi, coordinate,jml_kamar, isnego,foto,harga,isjual,  id_users,luastanah, deskripsi,created_date, kmr_mandi) VALUES ('${alamat}', '${koordinat}', ${kamar}, ${isNego == 'on' ? true : false},'${filenameRen}', ${harga}, ${kategori == 'jual' ? true : false}, 7, ${luasTanah}, '${desc}', current_timestamp, ${kmrmandi})`
+    });
+
+    router.post('/signup', (req, res) => {
+        var { username, no_tlp, email, password } = req.body;
+
+        var sql = `SELECT * FROM users WHERE email = '${email}'`;
         pool.query(sql, (err, result) => {
             if (err) {
-                console.log(err)
+                res.send('Gagal');
             } else {
-                res.redirect('/')
+                if (result.rows.length > 0) {
+                    res.json({
+                        data: result.rows.length,
+                        msg: 'emailexist'
+                    });
+                } else {
+                    bcrypt.hash(password, saltRounds, function (err, hash) {
+                        if (err) {
+                            res.send('Gagal ngehash')
+                        }
+                        var sql_insert = `INSERT INTO users (username,no_tlp, email, password, created_date) VALUES ('${username}', '${no_tlp}', '${email}', '${hash}', current_timestamp)`;
+                        pool.query(sql_insert, (err, result) => {
+                            if (err) {
+                                res.json({
+                                    msg: 'insertfailed'
+                                })
+                            } else {
+                                res.json({
+                                    msg: 'success'
+                                });
+                            }
+                        })
+                    });
+                }
             }
         })
     });
-
 
 
     return router;

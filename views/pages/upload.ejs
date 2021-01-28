@@ -1,28 +1,54 @@
 <%- include('../partials/header') %>
+    <style>
+        .img-fluid {
+            width: 100px;
+            height: 100px;
+            order: inherit;
+            ;
+        }
+    </style>
     <div class="container">
         <div class="py-5 text-center">
-            <img class="d-block mx-auto mb-4" src="/images/full-house-wide.png" alt="" width="72" height="72">
+            <img class="d-block mx-auto mb-4" src="/images/ERK Logo black.png" alt="" >
             <h2>Form Tambah Iklan</h2>
         </div>
 
         <form ref='uploadForm' id='uploadForm' action="http://localhost:3000/api/index/upload" method="POST"
             encType="multipart/form-data" class="needs-validation" novalidate>
-
+            <input type="text" value="<%= user.id %>" name="id_users" hidden>
             <div class="row">
-                <div class="col-md-4 order-md-2 mb-4">
-                    <h4 class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted">Upload Foto</span>
+                <div class="col-md-4  mb-1" style="border-right: 1px solid grey;;">
+                    <div class="col-md-"></div>
+                    <h4 class="d-flex justify-content-between align-items-center mb-3" style="padding-left: 110px;" >
+                        <span>Upload Foto</span>
                     </h4>
-                    <ul class="list-group mb-3">
-                        <li class="list-group-item d-flex justify-content-between lh-condensed" style="height:300px">
-                        </li>
-                    </ul>
-                    <div class="input-group mb-3">  
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input"  id="upload" name="sampleFile" multiple />
-                            <label class="custom-file-label" for="inputGroupFile01">Pilih Gambar...</label>
+                    <br><br>
+                    <input type="file" id="upload" name="sampleFile" hidden change="readURL()" multiple />
+                    <label for="upload">
+                        <div class="box-upload " id="upload-label" style="margin-left: 23px;">
+                            <div class="content-upload">
+                                <img type="button" id="imageResult1" src="/images/aditional/White_BG2.jpeg" alt=""
+                                    class="img-fluid rounded mx-auto d-block">
+                            </div>
                         </div>
-                    </div>
+                    </label>
+                    <label for="upload">
+                        <div class="box-upload" id="upload-label">
+                            <div class="content-upload">
+                                <img id="imageResult2" src="/images/aditional/kamera2.png" alt=""
+                                    class="img-fluid rounded mx-auto d-block">
+                            </div>
+                        </div>
+                    </label>
+                    <label for="upload">
+                        <div class="box-upload" id="upload-label">
+                            <div class="content-upload">
+                                <img id="imageResult3" src="/images/aditional/White_BG2.jpeg" alt=""
+                                    class="img-fluid rounded mx-auto d-block">
+                            </div>
+                        </div>
+                    </label><hr><small class="text-muted" style="font-size: 15px;">(Max 3 gambar)</small>
+
                 </div>
                 <div class="col-md-8 order-md-1">
                     <h4 class="mb-3">Deskripsi Rumah</h4>
@@ -120,16 +146,6 @@
         </form>
     </div>
 
-    <div class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text">Upload</span>
-        </div>
-        <div class="custom-file">
-            <input type="file" class="custom-file-input" id="inputGroupFile01">
-            <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
-        </div>
-    </div>
-
     <script type="text/javascript">
 
         // Example starter JavaScript for disabling form submissions if there are invalid fields
@@ -152,5 +168,25 @@
                     }, false)
                 })
         })()
+
+        $(document).ready(function () {
+            let readURL = function (input) {
+                if (input.files) {
+                    let filesAmount = input.files.length;
+                    for (let i = 0; i < filesAmount; i++) {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            $(`#imageResult${i + 1}`).attr('src', e.target.result);
+                        };
+                        reader.readAsDataURL(input.files[i]);
+                    }
+                }
+            };
+            $(function () {
+                $('#upload').on('change', function () {
+                    readURL(this)
+                });
+            });
+        })
     </script>
     <%- include('../partials/footer') %>

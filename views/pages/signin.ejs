@@ -26,41 +26,49 @@
                         <input placeholder="Password" class="form-control" type="password" data-parsley-required="true"
                             data-parsley-error-message="Please enter your password." id="password">
                     </div>
-                     <button class="btn btn-dark btn-lg btn-block" type="submit"
-                        id="signin_submit">Masuk</button><hr>
+                    <button class="btn btn-dark btn-lg btn-block" type="submit" id="signin_submit">Masuk</button>
+                    <hr>
                 </form>
                 <div>
-                   Baru di RumahLaku? <a href="/signup">Daftar</a>
+                    Baru di RumahLaku? <a href="/signup">Daftar</a>
                 </div>
             </div>
         </div>
 
         <script type="text/javascript">
             const API_URL = `http://localhost:3000/api/index`
-    
-                $(document).ready(function () {
-                    signin();
-                });
-                const signin = () => {
-                    $('#signin-form').on('submit', (e) => {
-                        e.preventDefault();
-                        let email = $('#email').val();
-                        let password = $('#password').val();
-                        $.ajax({
-                            url: `${API_URL}/signin`,
-                            method: 'POST',
-                            data: {
-                                email: email,
-                                password: password
-                            }
-                        }).done(function (data) {
-                           if(data.msg == 'logged_in'){
-                               window.location.href="/"
-                           }
-                        }).fail(function (jqXHR, textStatus) {
-                            alert("Request failed get data: " + textStatus);
-                        })
+
+            $(document).ready(function () {
+                signin();
+            });
+            const signin = () => {
+                $('#signin-form').on('submit', (e) => {
+                    e.preventDefault();
+                    let email = $('#email').val();
+                    let password = $('#password').val();
+                    $.ajax({
+                        url: `${API_URL}/signin`,
+                        method: 'POST',
+                        data: {
+                            email: email,
+                            password: password
+                        }
+                    }).done(function (data) {
+                        if (data.msg == 'logged_in') {
+                            Swal.fire({
+                                title: 'Welcome! Find your own heaven!',
+                                icon: 'success',
+                                showConfirmButton: false
+
+                            },
+                                window.location.href = "/"
+                            )
+
+                        }
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed get data: " + textStatus);
                     })
-                }
-            </script>
+                })
+            }
+        </script>
         <%- include('../partials/footer') %>

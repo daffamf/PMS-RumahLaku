@@ -11,13 +11,16 @@
 
     <body>
 
-        <div class="container">
-            <div class="detail">
-            </div>
+        <div class="container"><br><br><br>
+           
 
-            <br>
-            <div id="googleMap" style="width:100%;height:380px;box-shadow: 0 12px 10px 0 rgba(0,0,0,.2); "></div><br>
-            <hr>
+        <div class="detail">
+        </div>
+
+        <br>
+        <h2 class="text-muted">TITIK KOORDINAT</h2>
+        <div id="googleMap" style="width:100%;height:380px;box-shadow: 0 12px 10px 0 rgba(0,0,0,.2);"></div>
+        <hr>
         </div>
 
         <script type="text/javascript">
@@ -37,96 +40,72 @@
                 }).done(function (data) {
                     let rows = data.data
                     let foto = rows.foto.split(',')
-                    let deskripsi = rows.deskripsi
                     let html = `
-                    <div class="card">
-            <div class="card-body">
-                <div class="card-image"> <img class="card-img-top"
-                        src="/images/upload/${foto[0]}">
+                    <div class="col-md-14   ">
+                <div class="card flex-md-row mb-4 box-shadow h-md-20">
+                    <div class="card-body d-flex flex-column align-items-start">
+                        <strong class="d-inline-block mb-2 text-muted">${rows.isjual ? "DIJUAL" : "DISEWAKAN"}</strong>
+                        <h3 class="mb-0">
+                            <a class=" text-primary" href="#"></a>
+                        </h3>
+                        <h2 class="text-dark"><strong>${rows.judul}</strong><h2>
+                            <hr>
+                    </div>
+                            <img class="card-img-right flex-auto d-none d-md-block" data-src="holder.js/200x250?theme=thumb"
+                        alt="" style="width: 200px; height: 250px;"
+                        src="/images/upload/${foto[0]} ">
                 </div>
-                <p></p>
-                <h5 class="card-title" style="color: rgb(0, 140, 255);">Rp. ${rows.harga}
-                    <small class="negotiable">${rows.isNego ? "(Nego)" : "(Harga Pas)"}</small>
-                </h5>
-                <small class="text-muted">Deskripsi Rumah</small>
-                <p class="card-text">${rows.deskripsi == null ? "Tidak Ada Deskripsinya" : rows.deskripsi}</p>
-                <hr>
-                <p class="card-text"><small class="text-muted" id="cor">${rows.coordinate.x}
-                        ${rows.coordinate.y}</small></p>
             </div>
-        </div>
         <hr>
-        <div class="form-row" style="margin-top: 30px;">
-            <div class="col-md-8 mb-3">
-                <label for="validationTooltip01">Lokasi</label>
-                <input type="text" class="form-control" id="validationTooltip01" placeholder="First name"
-                    value="${rows.lokasi}" readonly>
+        
+        <div class="short-features">
+            <div class="heading-panel">
+                <h1 class="main-title text-left text-muted">
+                    Deskripsi</h1>
             </div>
-            <div class="col-md-4 mb-3">
-                <label for="validationTooltipUsername">No. Telepon Pemilik</label>
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" id="validationTooltipUsernamePrepend"><img
-                                src="/images/icon/phone.svg" alt=""></span>
-                    </div>
-                    <input type="text" class="form-control" id="validationTooltipUsername" placeholder="Phone Number"
-                        aria-describedby="validationTooltipUsernamePrepend" value="${rows.no_tlp}" readonly>
+            <div class="clear-custom">
+                <div class="col-sm-4 col-md-4 col-xs-12 no-padding">
+                    <span><strong>Harga</strong> :</span>
+                    Rp. ${rows.harga}<span class="negotiable">&nbsp;${rows.isnego ? "(Nego)" : "(Harga Pas)"}</span>
+                </div>
+                <div class="col-sm-4 col-md-4 col-xs-12 no-padding">
+                    <span><strong>Tanggal</strong> :</span> ${rows.created_date.slice(0, 10)}
+                </div>
+                <div class="col-sm-4 col-md-4 col-xs-12 no-padding">
+                    <span><strong>Kamar Tidur</strong> :</span> ${rows.jml_kamar} Buah
+                </div>
+                <div class="col-sm-4 col-md-4 col-xs-12 no-padding">
+                    <span><strong>Kamar Mandi</strong> :</span> ${rows.kmr_mandi} Buah
+                </div>
+                <div class="col-sm-4 col-md-4 col-xs-12 no-padding">
+                    <span><strong>Luas Tanah</strong> :</span>
+                    ${rows.luastanah} <strong>M2</strong>
+                </div>
+                <div class="col-sm-12 col-md-12 col-xs-12 no-padding">
+                    <span><strong>Lokasi</strong> :</span>
+                    ${rows.lokasi}
                 </div>
             </div>
         </div>
-        <div class="form-row">
-            <div class="col-md-3 mb-3">
-                <label for="validationTooltip04">Luas Tanah</label>
-                <div class="input-group">
-                    <input type="text" class="form-control" id="validationTooltip04" placeholder="Luas Tanah"
-                        value="${rows.luastanah}" readonly>
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" id="validationTooltipUsernamePrepend">m2</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-2 mb-3">
-                <label for="validationTooltip05">Kamar Tidur</label>
-                <div class="input-group">
-                <input type="text" class="form-control aa" id="validationTooltip05" placeholder="Jumlah Kamar"
-                    value="${rows.jml_kamar}" readonly>
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" id="validationTooltipUsernamePrepend">Buah</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-2 mb-3">
-                <label for="validationTooltip05">Kamar Mandi</label>
-                <div class="input-group">
-                <input type="text" class="form-control aa" id="validationTooltip05" placeholder="Jumlah Kamar"
-                    value="${rows.kmr_mandi}" readonly>
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" id="validationTooltipUsernamePrepend">Buah</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
         <hr>`
                     $('.detail').html(html)
+                    let map;
+                    var coordsArray = data.data.coordinate;
+                    map = new google.maps.Map(document.getElementById("googleMap"), {
+                        center: { lat: -6.923735, lng: 107.688739 },
+                        zoom: 12,
+                    });
+                    var marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(coordsArray.x, coordsArray.y),
+                        map: map
+                    });
+
+                    google.maps.event.addDomListener(window, 'load', $(this));
                 }).fail(function (jqXHR, textStatus) {
                     alert("Request Failed Get Data: " + textStatus);
                 })
             }
-            function initMap() {
-
-                map = new google.maps.Map(document.getElementById("googleMap"), {
-                    center: { lat: -6.923735, lng: 107.688739 },
-                    zoom: 9,
-                });
-                var marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(-6.923735, 107.688739),
-                    map: map
-                });
-                console.log(JSON.stringify(corX))
-            }
-            google.maps.event.addDomListener(window, 'load', initMap);
-
-
 
         </script>
         <%- include('../partials/footer') %>

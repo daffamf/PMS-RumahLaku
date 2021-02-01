@@ -13,11 +13,12 @@
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
     integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
     crossorigin="anonymous"></script>
-<style>
-  .nav-link{
-    color: #52adf2;
-  }
-</style>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <style>
+    .nav-link {
+      color: #52adf2;
+    }
+  </style>
   <script>
     // --------------Script for Drag and Drop--------------
     let dropped = []
@@ -90,7 +91,8 @@
         <div id="myDropdown" class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" href="#">
             <%= user.username%>
-          </a><hr>
+          </a>
+          <hr>
           <a class="dropdown-item" href="/add_iklan">Pasang Iklan</a>
           <a class="dropdown-item">Daftar Iklan</a>
           <div class="dropdown-divider"></div>
@@ -109,4 +111,5 @@
   </nav><br><br><br>
   <!-- Navigation Bar  -->
 </head>
+
 <body>

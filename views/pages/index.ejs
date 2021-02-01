@@ -303,12 +303,25 @@
                     method: 'GET',
                     dataType: 'json'
                 }).done(function (data) {
-                    let filter = JSON.stringify(data.filter)
-                    $("#filter").html(`${filter == 'null' ? `<h1>IKLAN TERAKHIR</h1><hr>` : `<h1>Pencarian Untuk '${filter.slice(9, filter.length - 1)}'<a href="/"><button class="btn btn-secondary">Clear</button></a></h1><hr>`}`)
+                    let filter = ''
+                    if (data.filter !== null) {
+                        let filterArr = data.filter.slice(8, data.filter.length).split("+")
+                        for (let j = 0; j < filterArr.length; j++) {
+                            filter += ` ${filterArr[j]}`
+                        }
+                    }
+                    $("#filter").html(`${data.filter == null ? `<h1>IKLAN TERAKHIR</h1><hr>` : `<h2 class="text-muted">Pencarian Untuk '${filter.trim()}'<br><a href="/"><button class="btn btn-secondary">Clear</button></a></h2><hr>`}`)
+
                     let rows = data.data
                     let html = ``
                     if (rows.length == 0) {
-                        html += `<h3 class="text-muted col-7 col-md-12"><img src="/images/icon/search_off-24px.svg"> Tidak ditemukan</h3>`
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Result not found!',
+                            showConfirmButton: false,
+                            footer: '<a class="btn btn-secondary" href="/">Back?</a>'
+                        })
                     } else {
                         rows.forEach((item, index) => {
                             let foto = item.foto.split(',')

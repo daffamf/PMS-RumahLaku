@@ -37,8 +37,8 @@
                             id="password">
                     </div>
                     <div class="form-group">
-                        <input placeholder="Ketik Ulang Password" class="form-control" type="password" name="password"
-                            id="password">
+                        <input placeholder="Ketik Ulang Password" class="form-control" type="password" name="repas"
+                            id="repas">
                     </div>
                     <button class="btn btn-dark btn-lg btn-block" type="submit">Daftar</button>
                     <hr>
@@ -62,6 +62,7 @@
                     let no_tlp = $('#no_tlp').val();
                     let email = $('#email').val();
                     let password = $('#password').val();
+                    let repas = $('#repas').val();
                     $.ajax({
                         url: `${API_URL}/signup`,
                         method: 'POST',
@@ -69,18 +70,32 @@
                             username: username,
                             no_tlp: no_tlp,
                             email: email,
-                            password: password
+                            password: password,
+                            repas: repas
                         }
                     }).done(function (data) {
-                        console.log(data)
                         if (data.msg == 'emailexist') {
-                            alert("Email sudah terdaftar")
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Email exist!'
+                            })
+                        }
+                        else if (data.msg == 'password not match') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'password not macth!'
+                            })
                         }
                         else if (data.msg == "success") {
-                            alert("Berhasil")
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Your data has been saved',
+                                showConfirmButton: false,
+                                timer: 1500
+                            })
                             window.location.href = "/signin"
-                        } else {
-                            alert("Email dan/atau Password Salah")
                         }
                     }).fail(function (jqXHR, textStatus) {
                         alert("Request failed get data: " + textStatus);

@@ -64,7 +64,7 @@ module.exports = function (pool) {
     })
   })
 
-  router.get('/upload',isLoggedin, (req, res) => {
+  router.get('/upload',isLoggedin,(req, res) => {
     res.render('upload', {
       title: 'Tambah Iklan',
       user: req.session.user,
